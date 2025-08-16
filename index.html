@@ -64,45 +64,6 @@
             background-color: #10b981 !important;
             border-color: #059669 !important;
         }
-
-        .note-feedback {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            font-weight: bold;
-            z-index: 100;
-            pointer-events: none;
-            animation: feedbackFade 1s ease-out forwards;
-        }
-
-        .feedback-perfect {
-            color: #10b981;
-        }
-
-        .feedback-good {
-            color: #f59e0b;
-        }
-
-        .feedback-poor {
-            color: #ef4444;
-        }
-
-        .feedback-miss {
-            color: #6b7280;
-        }
-
-        @keyframes feedbackFade {
-            0% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-        }
     </style>
 </head>
 <body>
@@ -115,6 +76,9 @@
                 <div class="text-2xl font-bold">
                     Score: <span id="score">0</span>
                 </div>
+                <button id="toggleNotesBtn" class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors text-sm">
+                    Show Notes
+                </button>
                 <div id="feedback" class="text-xl font-bold text-yellow-400 opacity-0">
                     Perfect!
                 </div>
@@ -136,15 +100,6 @@
                         >
                             Parse song
                         </button>
-                        <label for="songFileInput" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors whitespace-nowrap cursor-pointer">
-                            Upload JSON
-                        </label>
-                        <input
-                            type="file"
-                            id="songFileInput"
-                            accept=".json"
-                            class="hidden"
-                        />
                     </div>
 
                     <!-- Game Controls -->
@@ -182,16 +137,6 @@
             <div class="flex justify-center px-8 mb-8">
                 <div class="relative bg-gray-800 rounded-2xl p-4" style="width: 736px; height: 580px;">
                     
-                    <!-- Note Display Toggle -->
-                    <div class="absolute top-4 right-4 z-30">
-                        <button
-                            id="noteDisplayToggle"
-                            class="px-3 py-1 bg-gray-700 text-white rounded text-sm hover:bg-gray-600 transition-colors"
-                        >
-                            Show Keys
-                        </button>
-                    </div>
-
                     <!-- Falling Notes Container -->
                     <div id="notesContainer" class="absolute inset-4" style="bottom: 160px;">
                         <!-- Notes will be added here dynamically -->
@@ -254,16 +199,8 @@
         let score = 0;
         let gameStartTime = null;
         let animationId = null;
-        let showNotesOnFalling = true; // true = show notes (C4, D4), false = show keys (A, S)
-
-        // Hit tolerance constants
-        const HIT_TOLERANCE = {
-            PERFECT: 150, // ±150ms
-            GOOD: 300,    // ±300ms  
-            POOR: 500     // ±500ms
-        };
-
-        const FALL_DURATION = 5000; // 5 seconds for notes to fall
+        let showNotesOnFalling = false; // false = show keys (A, S), true = show notes (C4, D4)
+        let sustainedNotes = {}; // Track sustained audio for each key
 
         // Built-in songs
         const BUILT_IN_SONGS = {
@@ -371,7 +308,46 @@
             }
         }
 
-        // Play tone
+        // Play sustained tone (starts playing and continues until stopped)
+        function startSustainedTone(frequency, key) {
+            if (!audioContext || sustainedNotes[key]) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'triangle';
+
+            // Start with silence, then fade in
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.02);
+
+            oscillator.start(audioContext.currentTime);
+
+            // Store the oscillator and gain node for this key
+            sustainedNotes[key] = {
+                oscillator: oscillator,
+                gainNode: gainNode
+            };
+        }
+
+        // Stop sustained tone
+        function stopSustainedTone(key) {
+            if (!sustainedNotes[key]) return;
+
+            const { oscillator, gainNode } = sustainedNotes[key];
+
+            // Fade out quickly to avoid clicks
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            oscillator.stop(audioContext.currentTime + 0.05);
+
+            delete sustainedNotes[key];
+        }
+
+        // Play tone (legacy function for backwards compatibility)
         function playTone(frequency, duration = 0.3) {
             if (!audioContext) return;
 
@@ -392,13 +368,44 @@
             oscillator.stop(audioContext.currentTime + duration);
         }
 
-        // Play note
+        // Start playing note (sustained)
+        function startNote(note) {
+            const frequency = NOTE_FREQUENCIES[note];
+            if (!frequency) return;
+
+            const keyData = PIANO_KEYS.find(k => k.note === note);
+            const key = keyData ? keyData.key : note;
+
+            startSustainedTone(frequency, key);
+            
+            // Visual feedback
+            const keyElement = document.querySelector(`[data-note="${note}"]`);
+            if (keyElement) {
+                keyElement.classList.add('active');
+            }
+        }
+
+        // Stop playing note
+        function stopNote(note) {
+            const keyData = PIANO_KEYS.find(k => k.note === note);
+            const key = keyData ? keyData.key : note;
+
+            stopSustainedTone(key);
+            
+            // Remove visual feedback
+            const keyElement = document.querySelector(`[data-note="${note}"]`);
+            if (keyElement) {
+                keyElement.classList.remove('active');
+            }
+        }
+
+        // Play note (legacy function - now just triggers start/stop for mouse clicks)
         function playNote(note) {
             const frequency = NOTE_FREQUENCIES[note];
             if (frequency) {
                 playTone(frequency, 0.3);
                 
-                // Visual feedback on piano key
+                // Visual feedback
                 const keyElement = document.querySelector(`[data-note="${note}"]`);
                 if (keyElement) {
                     keyElement.classList.add('active');
@@ -406,83 +413,7 @@
                         keyElement.classList.remove('active');
                     }, 200);
                 }
-
-                // Check for note hits during gameplay
-                if (gameState === 'playing') {
-                    checkNoteHit(note);
-                }
             }
-        }
-
-        // Check for note hits and provide feedback
-        function checkNoteHit(note) {
-            const currentTime = Date.now() - gameStartTime;
-            
-            // Find notes that should be hit around this time
-            const eligibleNotes = fallingNotes.filter(fallingNote => {
-                if (fallingNote.note !== note || fallingNote.hit) return false;
-                
-                const expectedHitTime = fallingNote.startTime + FALL_DURATION;
-                const timeDiff = Math.abs(currentTime - expectedHitTime);
-                
-                return timeDiff <= HIT_TOLERANCE.POOR;
-            });
-
-            if (eligibleNotes.length === 0) return;
-
-            // Get the closest note
-            const closestNote = eligibleNotes.reduce((closest, current) => {
-                const currentDiff = Math.abs(currentTime - (current.startTime + FALL_DURATION));
-                const closestDiff = Math.abs(currentTime - (closest.startTime + FALL_DURATION));
-                return currentDiff < closestDiff ? current : closest;
-            });
-
-            const expectedHitTime = closestNote.startTime + FALL_DURATION;
-            const timeDiff = Math.abs(currentTime - expectedHitTime);
-
-            // Calculate score and feedback
-            let points = 0;
-            let feedbackText = '';
-            let feedbackClass = '';
-
-            if (timeDiff <= HIT_TOLERANCE.PERFECT) {
-                points = 10;
-                feedbackText = 'PERFECT!';
-                feedbackClass = 'feedback-perfect';
-            } else if (timeDiff <= HIT_TOLERANCE.GOOD) {
-                points = 7;
-                feedbackText = 'GOOD!';
-                feedbackClass = 'feedback-good';
-            } else if (timeDiff <= HIT_TOLERANCE.POOR) {
-                points = 3;
-                feedbackText = 'POOR';
-                feedbackClass = 'feedback-poor';
-            }
-
-            // Mark note as hit and add visual feedback
-            closestNote.hit = true;
-            if (closestNote.element) {
-                closestNote.element.classList.add('note-hit');
-                
-                // Add feedback text to the note
-                const feedbackElement = document.createElement('div');
-                feedbackElement.className = `note-feedback ${feedbackClass}`;
-                feedbackElement.textContent = feedbackText;
-                closestNote.element.appendChild(feedbackElement);
-
-                // Remove the note after feedback animation
-                setTimeout(() => {
-                    if (closestNote.element) {
-                        closestNote.element.remove();
-                        closestNote.element = null;
-                    }
-                }, 1000);
-            }
-
-            // Update score
-            score += points;
-            document.getElementById('score').textContent = score;
-            showFeedback(feedbackText);
         }
 
         // Create piano keyboard
@@ -496,7 +427,21 @@
                 keyElement.className = 'piano-key w-16 h-32 border border-gray-400 rounded-b-xl hover:bg-gray-100 active:bg-gray-200 transition-all duration-150 flex flex-col justify-end items-center pb-2 bg-white text-black';
                 keyElement.setAttribute('data-note', key.note);
                 keyElement.innerHTML = `<span class="text-xs font-bold">${key.key.toUpperCase()}</span>`;
-                keyElement.addEventListener('mousedown', () => playNote(key.note));
+                
+                // Mouse events for sustained audio
+                keyElement.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseup', () => {
+                    stopNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseleave', () => {
+                    stopNote(key.note);
+                });
+                
                 whiteKeysContainer.appendChild(keyElement);
             });
 
@@ -512,7 +457,21 @@
                 keyElement.style.left = `${leftOffset + 4}px`;
                 keyElement.setAttribute('data-note', key.note);
                 keyElement.innerHTML = `<span class="text-xs font-bold">${key.key.toUpperCase()}</span>`;
-                keyElement.addEventListener('mousedown', () => playNote(key.note));
+                
+                // Mouse events for sustained audio
+                keyElement.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseup', () => {
+                    stopNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseleave', () => {
+                    stopNote(key.note);
+                });
+                
                 blackKeysContainer.appendChild(keyElement);
             });
         }
@@ -532,51 +491,6 @@
                 alert('Song not found! Try: Happy birthday, Twinkle twinkle little star, or Mary had a little lamb');
                 return false;
             }
-        }
-
-        // Handle file upload
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const songData = JSON.parse(e.target.result);
-                    
-                    // Validate the JSON structure
-                    if (!songData.title || !songData.notes || !Array.isArray(songData.notes)) {
-                        throw new Error('Invalid song format. Must have "title" and "notes" array.');
-                    }
-
-                    // Validate each note
-                    for (const note of songData.notes) {
-                        if (!note.note || typeof note.time !== 'number' || typeof note.duration !== 'number') {
-                            throw new Error('Each note must have "note", "time", and "duration" properties.');
-                        }
-                        if (!NOTE_FREQUENCIES[note.note]) {
-                            throw new Error(`Invalid note: ${note.note}. Must be one of: ${Object.keys(NOTE_FREQUENCIES).join(', ')}`);
-                        }
-                    }
-
-                    // Load the custom song
-                    currentSong = songData;
-                    document.getElementById('songTitle').textContent = `${songData.title} (Custom)`;
-                    document.getElementById('gameControls').classList.remove('hidden');
-                    document.getElementById('songInput').value = '';
-                    
-                    console.log('Loaded custom song:', songData.title);
-                    alert(`Successfully loaded custom song: ${songData.title}`);
-                    
-                } catch (error) {
-                    console.error('Error parsing uploaded file:', error);
-                    alert(`Error loading song: ${error.message}\n\nExpected format:\n{\n  "title": "Song Name",\n  "notes": [\n    {"note": "C4", "duration": 0.5, "time": 0},\n    {"note": "D4", "duration": 0.5, "time": 0.5}\n  ]\n}`);
-                }
-            };
-            reader.readAsText(file);
-            
-            // Reset file input
-            event.target.value = '';
         }
 
         // Start game
@@ -640,31 +554,14 @@
                 // Update note position
                 if (note.element) {
                     const timeSinceStart = currentTime - note.startTime;
-                    const progress = Math.max(0, Math.min(1, timeSinceStart / FALL_DURATION));
+                    const fallDuration = 5000; // 5 seconds to fall
+                    const progress = Math.max(0, Math.min(1, timeSinceStart / fallDuration));
                     const yPosition = progress * 400; // Fall 400px
                     
                     note.element.style.top = `${yPosition}px`;
 
-                    // Check for missed notes
-                    if (yPosition > 400 && !note.hit) {
-                        // Add miss feedback
-                        const feedbackElement = document.createElement('div');
-                        feedbackElement.className = 'note-feedback feedback-miss';
-                        feedbackElement.textContent = 'MISS';
-                        note.element.appendChild(feedbackElement);
-                        
-                        setTimeout(() => {
-                            if (note.element) {
-                                note.element.remove();
-                                note.element = null;
-                            }
-                        }, 1000);
-                        
-                        note.hit = true; // Mark as processed
-                        showFeedback('Miss!');
-                    }
-                    // Remove notes that have been hit and finished their animation
-                    else if (yPosition > 400 && note.hit) {
+                    // Remove notes that have passed
+                    if (yPosition > 400) {
                         note.element.remove();
                         note.element = null;
                     }
@@ -714,23 +611,15 @@
             }, 1000);
         }
 
-        // Toggle note display mode
-        function toggleNoteDisplay() {
-            showNotesOnFalling = !showNotesOnFalling;
-            const toggleButton = document.getElementById('noteDisplayToggle');
-            toggleButton.textContent = showNotesOnFalling ? 'Show Keys' : 'Show Notes';
-            
-            // Update existing falling notes
-            fallingNotes.forEach(note => {
-                if (note.element) {
-                    const keyData = PIANO_KEYS.find(k => k.note === note.note);
-                    note.element.textContent = showNotesOnFalling ? note.note : (keyData?.key?.toUpperCase() || note.note);
-                }
-            });
-        }
-
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Prevent context menu on mouse down for better piano experience
+            document.addEventListener('contextmenu', (e) => {
+                if (e.target.classList.contains('piano-key')) {
+                    e.preventDefault();
+                }
+            });
+
             // Initialize audio on first interaction
             document.addEventListener('click', () => {
                 if (!audioContext) {
@@ -747,8 +636,20 @@
             // Keyboard events
             document.addEventListener('keydown', (e) => {
                 const note = KEY_MAPPINGS[e.key.toLowerCase()];
+                if (note && !e.repeat) { // Prevent key repeat
+                    startNote(note);
+                    if (gameState === 'playing') {
+                        score += 5;
+                        document.getElementById('score').textContent = score;
+                        showFeedback('Hit!');
+                    }
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                const note = KEY_MAPPINGS[e.key.toLowerCase()];
                 if (note) {
-                    playNote(note);
+                    stopNote(note);
                 }
             });
 
@@ -769,6 +670,21 @@
                 }
             });
 
+            // Toggle button for note display
+            document.getElementById('toggleNotesBtn').addEventListener('click', () => {
+                showNotesOnFalling = !showNotesOnFalling;
+                const btn = document.getElementById('toggleNotesBtn');
+                btn.textContent = showNotesOnFalling ? 'Show Keys' : 'Show Notes';
+                
+                // Update existing falling notes
+                fallingNotes.forEach(note => {
+                    if (note.element) {
+                        const keyData = PIANO_KEYS.find(k => k.note === note.note);
+                        note.element.textContent = showNotesOnFalling ? note.note : (keyData?.key?.toUpperCase() || note.note);
+                    }
+                });
+            });
+
             // Song suggestions
             document.querySelectorAll('.song-suggestion').forEach(button => {
                 button.addEventListener('click', () => {
@@ -780,9 +696,6 @@
 
             // Game controls
             document.getElementById('startGameBtn').addEventListener('click', startGame);
-            
-            // Note display toggle
-            document.getElementById('noteDisplayToggle').addEventListener('click', toggleNoteDisplay);
             
             document.getElementById('playAgainBtn').addEventListener('click', () => {
                 document.getElementById('gameCompletedOverlay').classList.add('hidden');
