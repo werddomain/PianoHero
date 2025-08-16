@@ -1,0 +1,30 @@
+{
+  "name": "piano-hero-game",
+  "version": "1.0.0",
+  "description": "A web-based Piano Hero rhythm game",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --host=localhost --open=/index.html",
+    "dev": "live-server --port=3000 --host=localhost --open=/index.html --watch=.",
+    "build": "echo 'Static build - files are ready for deployment'",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "piano",
+    "game",
+    "rhythm",
+    "music",
+    "web",
+    "react"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 11"
+  ]
+}
