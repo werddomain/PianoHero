@@ -1,0 +1,69 @@
+{
+  "songs": [
+    {
+      "difficulty": "Easy",
+      "list": [
+        {
+          "title": "Twinkle Twinkle Little Star",
+          "file": "songs/twinkle-twinkle.json",
+          "description": "A classic children's song, perfect for beginners"
+        },
+        {
+          "title": "Mary Had a Little Lamb",
+          "file": "songs/mary-had-a-little-lamb.json",
+          "description": "Simple melody with basic rhythm"
+        },
+        {
+          "title": "Happy Birthday",
+          "file": "songs/happy birthday.json",
+          "description": "The world's most recognized birthday song"
+        }
+      ]
+    },
+    {
+      "difficulty": "Medium",
+      "list": [
+        {
+          "title": "Jingle Bells",
+          "file": "songs/jingle-bells.json",
+          "description": "Popular Christmas carol with a lively rhythm"
+        },
+        {
+          "title": "Für Elise",
+          "file": "songs/fur-elise.json",
+          "description": "Beethoven's famous piano piece (simplified version)"
+        },
+        {
+          "title": "Ode to Joy",
+          "file": "songs/ode-to-joy.json",
+          "description": "Beethoven's famous melody from Symphony No. 9"
+        }
+      ]
+    },
+    {
+      "difficulty": "Hard",
+      "list": [
+        {
+          "title": "Moonlight Sonata (1st Movement)",
+          "file": "songs/moonlight-sonata.json",
+          "description": "Beethoven's haunting piano sonata with complex chords"
+        },
+        {
+          "title": "Flight of the Bumblebee",
+          "file": "songs/flight-of-the-bumblebee.json",
+          "description": "Rimsky-Korsakov's rapid and challenging piece"
+        }
+      ]
+    },
+    {
+      "difficulty": "Demo",
+      "list": [
+        {
+          "title": "Feature Demonstration",
+          "file": "songs/feature-demonstration.json",
+          "description": "A test song demonstrating all Piano Hero features"
+        }
+      ]
+    }
+  ]
+}

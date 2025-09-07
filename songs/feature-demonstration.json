@@ -1,0 +1,151 @@
+{
+  "name": "Feature Demonstration",
+  "notes": [
+    {
+      "note": "C4",
+      "duration": 1,
+      "time": 0,
+      "comment": "Single note with standard duration"
+    },
+    {
+      "note": "E4",
+      "duration": 0.5,
+      "time": 1,
+      "comment": "Short duration note"
+    },
+    {
+      "note": "G4",
+      "duration": 0.5,
+      "time": 1.5
+    },
+    {
+      "note": "C5",
+      "duration": 2,
+      "time": 2,
+      "comment": "Long duration note"
+    },
+    {
+      "note": ["C4", "E4", "G4"],
+      "duration": 1,
+      "time": 4,
+      "comment": "Triple chord"
+    },
+    {
+      "note": ["D4", "F4"],
+      "duration": 1,
+      "time": 5,
+      "comment": "Double note"
+    },
+    {
+      "note": "A4",
+      "duration": 0.25,
+      "time": 6,
+      "comment": "Very short duration"
+    },
+    {
+      "note": "B4",
+      "duration": 0.25,
+      "time": 6.25
+    },
+    {
+      "note": "C5",
+      "duration": 0.25,
+      "time": 6.5
+    },
+    {
+      "note": "D5",
+      "duration": 0.25,
+      "time": 6.75
+    },
+    {
+      "note": "E5",
+      "duration": 3,
+      "time": 7,
+      "comment": "Extra long duration"
+    },
+    {
+      "note": "C4",
+      "duration": 1,
+      "time": 10
+    },
+    {
+      "note": "D4",
+      "duration": 1,
+      "time": 10,
+      "comment": "Simultaneous notes (same time value)"
+    },
+    {
+      "note": ["F4", "A4"],
+      "duration": 0.5,
+      "time": 11,
+      "comment": "Short duration chord"
+    },
+    {
+      "note": ["G4", "B4", "D5"],
+      "duration": 0.5,
+      "time": 11.5,
+      "comment": "Triple chord with short duration"
+    },
+    {
+      "note": "C5",
+      "duration": 0.33,
+      "time": 12,
+      "comment": "Triplet rhythm demonstration"
+    },
+    {
+      "note": "B4",
+      "duration": 0.33,
+      "time": 12.33
+    },
+    {
+      "note": "A4",
+      "duration": 0.34,
+      "time": 12.66
+    },
+    {
+      "note": ["C3", "C4", "C5", "C6"],
+      "duration": 2,
+      "time": 13,
+      "comment": "Four-note chord across wide range"
+    },
+    
+    {
+      "note": ["C4", "E4"],
+      "duration": 4,
+      "time": 16,
+      "comment": "Very long chord duration"
+    },
+    {
+      "note": "C5",
+      "duration": 0.1,
+      "time": 20,
+      "comment": "Extremely short duration"
+    },
+    {
+      "note": "C5",
+      "duration": 0.1,
+      "time": 20.1
+    },
+    {
+      "note": "C5",
+      "duration": 0.1,
+      "time": 20.2
+    },
+    {
+      "note": "C5",
+      "duration": 0.1,
+      "time": 20.3
+    },
+    {
+      "note": "C5",
+      "duration": 0.1,
+      "time": 20.4
+    },
+    {
+      "note": ["C3", "G3", "C4", "E4", "G4", "C5"],
+      "duration": 2,
+      "time": 21,
+      "comment": "Six-note chord (full C major)"
+    }
+  ]
+}

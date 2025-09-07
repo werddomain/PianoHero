@@ -359,14 +359,35 @@ const PianoHero = () => {
     gameStartTimeRef.current = Date.now();
 
     // Create falling notes with unique IDs
-    const notes = currentSong.notes.map((note, index) => ({
-      id: `${note.note}-${note.time}-${index}`,
-      note: note.note,
-      startTime: note.time * 1000, // Convert to milliseconds
-      duration: note.duration * 1000,
-      hit: false,
-      position: getNotePosition(note.note)
-    }));
+    // Handle both individual notes and chord arrays
+    const notes = [];
+    currentSong.notes.forEach((noteItem, index) => {
+      if (Array.isArray(noteItem.note)) {
+        // Handle chord (multiple notes in an array)
+        noteItem.note.forEach((singleNote, noteIndex) => {
+          notes.push({
+            id: `${singleNote}-${noteItem.time}-${index}-${noteIndex}`,
+            note: singleNote,
+            startTime: noteItem.time * 1000, // Convert to milliseconds
+            duration: noteItem.duration * 1000,
+            hit: false,
+            position: getNotePosition(singleNote),
+            isChord: true,
+            chordId: `chord-${noteItem.time}-${index}`
+          });
+        });
+      } else {
+        // Handle single note
+        notes.push({
+          id: `${noteItem.note}-${noteItem.time}-${index}`,
+          note: noteItem.note,
+          startTime: noteItem.time * 1000, // Convert to milliseconds
+          duration: noteItem.duration * 1000,
+          hit: false,
+          position: getNotePosition(noteItem.note)
+        });
+      }
+    });
 
     setFallingNotes(notes);
 

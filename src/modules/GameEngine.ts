@@ -71,8 +71,31 @@ export class GameEngine {
     
     if (this.song) {
       // Deep clone the notes to avoid modifying the original
-      this.pendingNotes = JSON.parse(JSON.stringify(this.song.notes))
-        .sort((a: Note, b: Note) => a.time - b.time);
+      const songNotes = JSON.parse(JSON.stringify(this.song.notes));
+      
+      // Process notes - expand chord arrays into individual notes
+      const processedNotes: Note[] = [];
+      
+      songNotes.forEach((noteItem: Note, index: number) => {
+        if (Array.isArray(noteItem.note)) {
+          // Handle chord (multiple notes in an array)
+          noteItem.note.forEach((singleNote: string, noteIndex: number) => {
+            processedNotes.push({
+              note: singleNote,
+              time: noteItem.time,
+              duration: noteItem.duration,
+              isHit: false,
+              isChord: true,
+              chordId: `chord-${noteItem.time}-${index}`
+            });
+          });
+        } else {
+          // Handle single note
+          processedNotes.push(noteItem);
+        }
+      });
+      
+      this.pendingNotes = processedNotes.sort((a: Note, b: Note) => a.time - b.time);
     } else {
       this.pendingNotes = [];
     }
@@ -227,11 +250,12 @@ export class GameEngine {
   public handleNotePress(noteName: string): void {
     if (!this.isPlaying) return;
 
-    const matchingNotes = this.activeNotes.filter(note => 
-      note.note === noteName && 
-      !note.isHit && 
-      Math.abs(note.time - this.currentTime) <= TIMING_WINDOWS.POOR / 1000
-    );
+    const matchingNotes = this.activeNotes.filter(note => {
+      // Each note is now a string since we expanded the chord arrays in resetGameState
+      return note.note === noteName && 
+             !note.isHit && 
+             Math.abs(note.time - this.currentTime) <= TIMING_WINDOWS.POOR / 1000;
+    });
 
     if (matchingNotes.length === 0) return;
 

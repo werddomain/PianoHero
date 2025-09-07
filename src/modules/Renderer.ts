@@ -216,10 +216,11 @@ export class Renderer {
     element.classList.add(colorClass);
     
     // Show note name inside the element
-    element.textContent = note.note;
+    const noteText = Array.isArray(note.note) ? note.note[0] : note.note;
+    element.textContent = noteText;
     
     // Position horizontally based on the note
-    const position = this.getNotePosition(note.note);
+    const position = this.getNotePosition(noteText);
     element.style.left = `${position}px`;
     
     return element;
@@ -294,7 +295,9 @@ export class Renderer {
   // Handle note state changes from game engine
   private handleNoteStateChange(note: Note) {
     if (note.isHit && note.hitQuality) {
-      this.showHitFeedback(note.hitQuality, note.note);
+      // Convert array to single note if it's an array
+      const noteForFeedback = Array.isArray(note.note) ? note.note[0] : note.note;
+      this.showHitFeedback(note.hitQuality, noteForFeedback);
     }
   }
   

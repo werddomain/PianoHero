@@ -1,12 +1,14 @@
 // Define basic types and interfaces for notes
 export interface Note {
-  note: string;    // The note name (e.g., 'C4', 'D4')
+  note: string | string[];    // The note name (e.g., 'C4', 'D4') or chord array (e.g., ['C4', 'E4', 'G4'])
   time: number;    // When the note should be played (seconds)
   duration: number; // How long the note lasts (seconds)
   isHit?: boolean; // Whether the note has been hit
   hitQuality?: 'perfect' | 'good' | 'poor' | 'miss'; // Quality of the hit
   element?: HTMLElement; // DOM element representing the note
   timeToHit?: number; // Time remaining until the note should be hit
+  isChord?: boolean; // Whether this note is part of a chord
+  chordId?: string;  // ID to identify notes that are part of the same chord
 }
 
 export interface Song {

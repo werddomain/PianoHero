@@ -1,0 +1,305 @@
+{
+  "name": "Flight of the Bumblebee",
+  "notes": [
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 0
+    },
+    {
+      "note": "D#5",
+      "duration": 0.25,
+      "time": 0.25
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 0.5
+    },
+    {
+      "note": "D#5",
+      "duration": 0.25,
+      "time": 0.75
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 1
+    },
+    {
+      "note": "B4",
+      "duration": 0.25,
+      "time": 1.25
+    },
+    {
+      "note": "D5",
+      "duration": 0.25,
+      "time": 1.5
+    },
+    {
+      "note": "C5",
+      "duration": 0.25,
+      "time": 1.75
+    },
+    {
+      "note": "A4",
+      "duration": 0.25,
+      "time": 2
+    },
+    {
+      "note": "C4",
+      "duration": 0.25,
+      "time": 2.25
+    },
+    {
+      "note": "E4",
+      "duration": 0.25,
+      "time": 2.5
+    },
+    {
+      "note": "A4",
+      "duration": 0.25,
+      "time": 2.75
+    },
+    {
+      "note": "B4",
+      "duration": 0.25,
+      "time": 3
+    },
+    {
+      "note": "C5",
+      "duration": 0.25,
+      "time": 3.25
+    },
+    {
+      "note": "D5",
+      "duration": 0.25,
+      "time": 3.5
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 3.75
+    },
+    {
+      "note": "G5",
+      "duration": 0.25,
+      "time": 4
+    },
+    {
+      "note": "F5",
+      "duration": 0.25,
+      "time": 4.25
+    },
+    {
+      "note": "D#5",
+      "duration": 0.25,
+      "time": 4.5
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 4.75
+    },
+    {
+      "note": "D#5",
+      "duration": 0.25,
+      "time": 5
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 5.25
+    },
+    {
+      "note": "B4",
+      "duration": 0.25,
+      "time": 5.5
+    },
+    {
+      "note": "D5",
+      "duration": 0.25,
+      "time": 5.75
+    },
+    {
+      "note": "C5",
+      "duration": 0.25,
+      "time": 6
+    },
+    {
+      "note": "A4",
+      "duration": 0.25,
+      "time": 6.25
+    },
+    {
+      "note": ["A4", "C5"],
+      "duration": 0.25,
+      "time": 6.5
+    },
+    {
+      "note": ["A4", "C5"],
+      "duration": 0.25,
+      "time": 6.75
+    },
+    {
+      "note": ["A4", "C5"],
+      "duration": 0.5,
+      "time": 7
+    },
+    {
+      "note": "A4",
+      "duration": 0.25,
+      "time": 7.5
+    },
+    {
+      "note": "B4",
+      "duration": 0.25,
+      "time": 7.75
+    },
+    {
+      "note": "C5",
+      "duration": 0.25,
+      "time": 8
+    },
+    {
+      "note": "D5",
+      "duration": 0.25,
+      "time": 8.25
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 8.5
+    },
+    {
+      "note": "F5",
+      "duration": 0.25,
+      "time": 8.75
+    },
+    {
+      "note": "G5",
+      "duration": 0.25,
+      "time": 9
+    },
+    {
+      "note": "A5",
+      "duration": 0.25,
+      "time": 9.25
+    },
+    {
+      "note": "B5",
+      "duration": 0.25,
+      "time": 9.5
+    },
+    {
+      "note": "C6",
+      "duration": 0.25,
+      "time": 9.75
+    },
+    {
+      "note": "A5",
+      "duration": 0.25,
+      "time": 10
+    },
+    {
+      "note": "B5",
+      "duration": 0.25,
+      "time": 10.25
+    },
+    {
+      "note": "C6",
+      "duration": 0.25,
+      "time": 10.5
+    },
+    {
+      "note": "D6",
+      "duration": 0.25,
+      "time": 10.75
+    },
+    {
+      "note": "E6",
+      "duration": 0.25,
+      "time": 11
+    },
+    {
+      "note": "F6",
+      "duration": 0.25,
+      "time": 11.25
+    },
+    {
+      "note": "G6",
+      "duration": 0.25,
+      "time": 11.5
+    },
+    {
+      "note": "F6",
+      "duration": 0.25,
+      "time": 11.75
+    },
+    {
+      "note": "E6",
+      "duration": 0.25,
+      "time": 12
+    },
+    {
+      "note": "D6",
+      "duration": 0.25,
+      "time": 12.25
+    },
+    {
+      "note": "C6",
+      "duration": 0.25,
+      "time": 12.5
+    },
+    {
+      "note": "B5",
+      "duration": 0.25,
+      "time": 12.75
+    },
+    {
+      "note": "A5",
+      "duration": 0.25,
+      "time": 13
+    },
+    {
+      "note": "G5",
+      "duration": 0.25,
+      "time": 13.25
+    },
+    {
+      "note": "F5",
+      "duration": 0.25,
+      "time": 13.5
+    },
+    {
+      "note": "E5",
+      "duration": 0.25,
+      "time": 13.75
+    },
+    {
+      "note": ["E5", "G5"],
+      "duration": 0.5,
+      "time": 14
+    },
+    {
+      "note": ["D5", "F5"],
+      "duration": 0.5,
+      "time": 14.5
+    },
+    {
+      "note": ["C5", "E5"],
+      "duration": 0.5,
+      "time": 15
+    },
+    {
+      "note": ["B4", "D5"],
+      "duration": 0.5,
+      "time": 15.5
+    },
+    {
+      "note": ["A4", "C5"],
+      "duration": 1,
+      "time": 16
+    }
+  ]
+}

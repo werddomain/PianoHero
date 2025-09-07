@@ -47,6 +47,26 @@ export class SongLoader {
             throw new Error('Invalid song format');
           }
           
+          // Validate notes - each note should be either a string or an array of strings
+          for (const noteItem of songData.notes) {
+            if (!noteItem.time && noteItem.time !== 0) throw new Error('Note missing time property');
+            if (!noteItem.duration) throw new Error('Note missing duration property');
+            
+            // Note can be a string or a string array (for chords)
+            if (typeof noteItem.note !== 'string' && !Array.isArray(noteItem.note)) {
+              throw new Error('Note should be a string or array of strings');
+            }
+            
+            // If it's an array, validate each element is a string
+            if (Array.isArray(noteItem.note)) {
+              for (const noteName of noteItem.note) {
+                if (typeof noteName !== 'string') {
+                  throw new Error('Each note in a chord must be a string');
+                }
+              }
+            }
+          }
+          
           resolve(songData as Song);
         } catch (error) {
           reject(error);
