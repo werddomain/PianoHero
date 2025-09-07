@@ -2,12 +2,12 @@
   "name": "piano-hero-game",
   "version": "1.0.0",
   "description": "A web-based Piano Hero rhythm game",
-  "main": "index.html",
+  "main": "dist/index.html",
   "scripts": {
-    "start": "live-server --port=3000 --host=localhost --open=/index.html",
-    "dev": "live-server --port=3000 --host=localhost --open=/index.html --watch=.",
-    "build": "echo 'Static build - files are ready for deployment'",
-    "serve": "python -m http.server 8000"
+    "start": "webpack --config webpack.config.js && npm run serve",
+    "dev": "webpack --config webpack.config.js --watch",
+    "build": "webpack --config webpack.config.js",
+    "serve": "http-server -p 8000"
   },
   "keywords": [
     "piano",
@@ -20,7 +20,11 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
-    "live-server": "^1.2.2"
+    "http-server": "^14.1.1",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^5.1.4"
   },
   "browserslist": [
     "> 1%",

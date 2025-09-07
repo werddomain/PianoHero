@@ -5,18 +5,52 @@
             "name": "Launch Piano Hero in Chrome",
             "type": "chrome",
             "request": "launch",
-            "url": "http://localhost:8000",
+            "url": "http://localhost:8000/dist/index.html",
             "webRoot": "${workspaceFolder}",
             "sourceMaps": true,
-            "trace": true
+            "trace": true,
+            "preLaunchTask": "Start Piano Hero Game Server",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/src/*"
+            }
         },
         {
             "name": "Launch Piano Hero in Edge",
             "type": "msedge",
             "request": "launch",
-            "url": "http://localhost:8000",
+            "url": "http://localhost:8000/dist/index.html",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "preLaunchTask": "Start Piano Hero Game Server",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/src/*"
+            }
+        },
+        {
+            "name": "Build and Launch Piano Hero",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:8000/dist/index.html",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true,
+            "preLaunchTask": "Build and Start Server",
+            "sourceMapPathOverrides": {
+                "webpack:///src/*": "${webRoot}/src/*"
+            }
+        },
+        {
+            "name": "Attach to Chrome",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
             "webRoot": "${workspaceFolder}",
             "sourceMaps": true
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Build & Debug Piano Hero",
+            "configurations": ["Build and Launch Piano Hero"]
         }
     ]
 }

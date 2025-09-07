@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Hero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-gray-800 p-4 shadow-md">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-4xl font-bold text-center">Piano Hero</h1>
+                <p class="text-center text-gray-400">Play the piano notes as they fall from the top!</p>
+            </div>
+        </header>
+
+        <main class="flex-1 p-4">
+            <div class="max-w-6xl mx-auto flex flex-col gap-4">
+                <div id="ui-container" class="w-full"></div>
+                <div id="game-container" class="w-full h-full bg-gray-800 rounded-lg shadow-xl overflow-hidden"></div>
+            </div>
+        </main>
+
+        <footer class="bg-gray-800 p-4 text-center text-gray-400">
+            <div class="max-w-6xl mx-auto">
+                <p>Piano Hero Game - Press keys on your keyboard to play notes</p>
+                <p class="text-sm mt-2">Use keys A-S-D-F-G-H-J-K-L-; for white keys, W-E-T-Y-U-O-P for black keys</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="bundle.js"></script>
+</body>
+</html>

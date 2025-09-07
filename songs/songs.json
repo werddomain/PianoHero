@@ -1,0 +1,10 @@
+{
+  "songs": [
+    {
+      "id": "happy-birthday",
+      "title": "Happy Birthday",
+      "file": "happy birthday.json",
+      "difficulty": "Easy"
+    }
+  ]
+}

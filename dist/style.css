@@ -1,0 +1,118 @@
+/* Piano Hero Styles */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #111827;
+    color: white;
+}
+
+/* Piano Keys */
+.piano-key {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: all 0.1s ease;
+}
+
+.piano-key:hover {
+    transform: translateY(2px);
+}
+
+.piano-key.active {
+    background-color: #fbbf24 !important;
+    transform: translateY(4px);
+}
+
+/* Falling Notes */
+.falling-note {
+    position: absolute;
+    width: 48px;
+    height: 32px;
+    border-radius: 8px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    transition: top 0.1s linear;
+}
+
+.note-blue {
+    background-color: #3b82f6;
+    border-color: #2563eb;
+    color: white;
+}
+
+.note-purple {
+    background-color: #8b5cf6;
+    border-color: #7c3aed;
+    color: white;
+}
+
+.note-hit {
+    background-color: #10b981 !important;
+    border-color: #059669 !important;
+}
+
+/* Animation classes */
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 0.3s;
+}
+
+/* Transitions */
+.scale-transition {
+    transition: transform 0.2s ease;
+}
+
+/* Game elements */
+#notes-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background-color: #1f2937;
+    border-bottom: 2px solid white;
+    margin: 0 auto;
+}
+
+#piano-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: visible;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    #notes-container {
+        height: 300px;
+    }
+
+    #piano-container {
+        height: 120px;
+    }
+}

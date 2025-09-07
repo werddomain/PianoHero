@@ -1,18 +1,84 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Start Piano Hero Game Server",
-			"type": "shell",
-			"command": "python",
-			"args": [
-				"-m",
-				"http.server",
-				"8000"
-			],
-			"group": "build",
-			"isBackground": true,
-			"problemMatcher": []
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Piano Hero Game Server",
+            "type": "shell",
+            "command": "npx",
+            "args": [
+                "http-server",
+                "-p",
+                "8000"
+            ],
+            "isBackground": true,
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "Starting up http-server",
+                        "endsPattern": "Available on"
+                    }
+                }
+            ],
+            "group": "build"
+        },
+        {
+            "label": "Build Piano Hero",
+            "type": "shell",
+            "command": "npx",
+            "args": [
+                "webpack"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": ["$tsc"]
+        },
+        {
+            "label": "Build and Start Server",
+            "dependsOrder": "sequence",
+            "dependsOn": ["Build Piano Hero", "Start Piano Hero Game Server"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Watch Build",
+            "type": "shell",
+            "command": "npx",
+            "args": [
+                "webpack",
+                "--watch"
+            ],
+            "isBackground": true,
+            "group": "build",
+            "problemMatcher": {
+                "owner": "typescript",
+                "fileLocation": "relative",
+                "pattern": {
+                    "regexp": "^([^\\s].*)\\((\\d+|\\d+,\\d+|\\d+,\\d+,\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+                    "file": 1,
+                    "location": 2,
+                    "severity": 3,
+                    "code": 4,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "webpack \\d+\\.\\d+\\.\\d+ compiled",
+                    "endsPattern": "webpack \\d+\\.\\d+\\.\\d+ compiled successfully"
+                }
+            }
+        }
+    ]
 }

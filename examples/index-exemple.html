@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Hero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: #111827;
+            color: white;
+        }
+
+        .piano-key {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            transition: all 0.1s ease;
+        }
+
+        .piano-key:hover {
+            transform: translateY(2px);
+        }
+
+        .piano-key.active {
+            background-color: #fbbf24 !important;
+            transform: translateY(4px);
+        }
+
+        .falling-note {
+            position: absolute;
+            width: 48px;
+            height: 32px;
+            border-radius: 8px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            transition: top 0.1s linear;
+        }
+
+        .note-blue {
+            background-color: #3b82f6;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .note-purple {
+            background-color: #8b5cf6;
+            border-color: #7c3aed;
+            color: white;
+        }
+
+        .note-hit {
+            background-color: #10b981 !important;
+            border-color: #059669 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-900 text-white p-4">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-4xl font-bold text-center mb-4 mt-8">Piano Hero</h1>
+            
+            <!-- Score Display -->
+            <div class="flex justify-center items-center gap-8 mb-4">
+                <div class="text-2xl font-bold">
+                    Score: <span id="score">0</span>
+                </div>
+                <button id="toggleNotesBtn" class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors text-sm">
+                    Show Notes
+                </button>
+                <div id="feedback" class="text-xl font-bold text-yellow-400 opacity-0">
+                    Perfect!
+                </div>
+            </div>
+
+            <!-- Song Input Section -->
+            <div class="flex justify-center px-8 mb-4">
+                <div class="bg-gray-800 rounded-lg shadow-sm p-4" style="width: 736px;">
+                    <div class="flex gap-3 items-center">
+                        <input
+                            type="text"
+                            id="songInput"
+                            placeholder="Request a song..."
+                            class="flex-1 px-3 py-2 border border-gray-600 rounded focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none text-white bg-gray-700"
+                        />
+                        <button
+                            id="parseSongBtn"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors whitespace-nowrap"
+                        >
+                            Parse song
+                        </button>
+                    </div>
+
+                    <!-- Game Controls -->
+                    <div id="gameControls" class="mt-4 pt-4 border-t border-gray-600 hidden">
+                        <div class="flex items-center justify-between">
+                            <h3 id="songTitle" class="text-lg font-medium text-gray-200">
+                                Song Title
+                            </h3>
+                            <div class="flex gap-2">
+                                <button
+                                    id="startGameBtn"
+                                    class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                >
+                                    Start Game
+                                </button>
+                                <button
+                                    id="pauseBtn"
+                                    class="px-3 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors hidden"
+                                >
+                                    Pause
+                                </button>
+                                <button
+                                    id="playAgainBtn"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors hidden"
+                                >
+                                    Play Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Area -->
+            <div class="flex justify-center px-8 mb-8">
+                <div class="relative bg-gray-800 rounded-2xl p-4" style="width: 736px; height: 580px;">
+                    
+                    <!-- Falling Notes Container -->
+                    <div id="notesContainer" class="absolute inset-4" style="bottom: 160px;">
+                        <!-- Notes will be added here dynamically -->
+                    </div>
+
+                    <!-- Game Completed Overlay -->
+                    <div id="gameCompletedOverlay" class="absolute inset-4 bg-black bg-opacity-75 flex items-center justify-center z-40 rounded-xl hidden">
+                        <div class="text-4xl font-bold text-white text-center">
+                            <div class="text-6xl mb-4">🎉</div>
+                            <div class="text-5xl mb-2">SONG COMPLETE!</div>
+                            <div class="text-2xl mb-4 text-yellow-400">Final Score: <span id="finalScore">0</span></div>
+                            <div class="text-lg opacity-75">Great job! Ready for another song?</div>
+                        </div>
+                    </div>
+
+                    <!-- Hit Line -->
+                    <div class="absolute left-4 right-4 h-1 bg-red-500 shadow-lg shadow-red-500/50" style="bottom: 160px;"></div>
+
+                    <!-- Piano Keyboard -->
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <div class="relative">
+                            <!-- White keys -->
+                            <div class="flex" id="whiteKeys">
+                                <!-- White keys will be generated here -->
+                            </div>
+                            <!-- Black keys -->
+                            <div class="absolute top-0 left-0 flex" id="blackKeys">
+                                <!-- Black keys will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Song Suggestions -->
+            <div class="flex justify-center px-8">
+                <div style="width: 736px;">
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <button class="song-suggestion px-3 py-1 bg-gray-700 text-gray-200 rounded-full text-sm hover:bg-gray-600 transition-colors" data-song="Happy birthday">
+                            Happy birthday
+                        </button>
+                        <button class="song-suggestion px-3 py-1 bg-gray-700 text-gray-200 rounded-full text-sm hover:bg-gray-600 transition-colors" data-song="Twinkle twinkle little star">
+                            Twinkle twinkle little star
+                        </button>
+                        <button class="song-suggestion px-3 py-1 bg-gray-700 text-gray-200 rounded-full text-sm hover:bg-gray-600 transition-colors" data-song="Mary had a little lamb">
+                            Mary had a little lamb
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let audioContext = null;
+        let gameState = 'idle'; // idle, ready, playing, paused, finished
+        let currentSong = null;
+        let fallingNotes = [];
+        let score = 0;
+        let gameStartTime = null;
+        let animationId = null;
+        let showNotesOnFalling = false; // false = show keys (A, S), true = show notes (C4, D4)
+        let sustainedNotes = {}; // Track sustained audio for each key
+
+        // Built-in songs
+        const BUILT_IN_SONGS = {
+            "happy birthday": {
+                title: "Happy Birthday",
+                notes: [
+                    {"note": "C4", "duration": 0.5, "time": 0},
+                    {"note": "C4", "duration": 0.5, "time": 0.5},
+                    {"note": "D4", "duration": 1, "time": 1},
+                    {"note": "C4", "duration": 1, "time": 2},
+                    {"note": "F4", "duration": 1, "time": 3},
+                    {"note": "E4", "duration": 2, "time": 4},
+                    {"note": "C4", "duration": 0.5, "time": 6.5},
+                    {"note": "C4", "duration": 0.5, "time": 7},
+                    {"note": "D4", "duration": 1, "time": 7.5},
+                    {"note": "C4", "duration": 1, "time": 8.5},
+                    {"note": "G4", "duration": 1, "time": 9.5},
+                    {"note": "F4", "duration": 2, "time": 10.5}
+                ]
+            },
+            "twinkle twinkle little star": {
+                title: "Twinkle Twinkle Little Star",
+                notes: [
+                    {"note": "C4", "duration": 0.5, "time": 0},
+                    {"note": "C4", "duration": 0.5, "time": 0.5},
+                    {"note": "G4", "duration": 0.5, "time": 1},
+                    {"note": "G4", "duration": 0.5, "time": 1.5},
+                    {"note": "A4", "duration": 0.5, "time": 2},
+                    {"note": "A4", "duration": 0.5, "time": 2.5},
+                    {"note": "G4", "duration": 1, "time": 3},
+                    {"note": "F4", "duration": 0.5, "time": 4.5},
+                    {"note": "F4", "duration": 0.5, "time": 5},
+                    {"note": "E4", "duration": 0.5, "time": 5.5},
+                    {"note": "E4", "duration": 0.5, "time": 6},
+                    {"note": "D4", "duration": 0.5, "time": 6.5},
+                    {"note": "D4", "duration": 0.5, "time": 7},
+                    {"note": "C4", "duration": 1, "time": 7.5}
+                ]
+            },
+            "mary had a little lamb": {
+                title: "Mary Had a Little Lamb",
+                notes: [
+                    {"note": "E4", "duration": 0.5, "time": 0},
+                    {"note": "D4", "duration": 0.5, "time": 0.5},
+                    {"note": "C4", "duration": 0.5, "time": 1},
+                    {"note": "D4", "duration": 0.5, "time": 1.5},
+                    {"note": "E4", "duration": 0.5, "time": 2},
+                    {"note": "E4", "duration": 0.5, "time": 2.5},
+                    {"note": "E4", "duration": 1, "time": 3},
+                    {"note": "D4", "duration": 0.5, "time": 4.5},
+                    {"note": "D4", "duration": 0.5, "time": 5},
+                    {"note": "D4", "duration": 1, "time": 5.5},
+                    {"note": "E4", "duration": 0.5, "time": 7},
+                    {"note": "G4", "duration": 0.5, "time": 7.5},
+                    {"note": "G4", "duration": 1, "time": 8}
+                ]
+            }
+        };
+
+        // Note frequencies
+        const NOTE_FREQUENCIES = {
+            'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'D#4': 311.13, 'E4': 329.63,
+            'F4': 349.23, 'F#4': 369.99, 'G4': 392.00, 'G#4': 415.30, 'A4': 440.00,
+            'A#4': 466.16, 'B4': 493.88, 'C5': 523.25, 'C#5': 554.37, 'D5': 587.33,
+            'D#5': 622.25, 'E5': 659.25, 'F5': 698.46, 'F#5': 739.99, 'G5': 783.99
+        };
+
+        // Key mappings
+        const KEY_MAPPINGS = {
+            'a': 'C4', 'w': 'C#4', 's': 'D4', 'e': 'D#4', 'd': 'E4',
+            'f': 'F4', 't': 'F#4', 'g': 'G4', 'y': 'G#4', 'h': 'A4', 
+            'u': 'A#4', 'j': 'B4', 'k': 'C5', 'o': 'C#5', 'l': 'D5',
+            'p': 'D#5', ';': 'E5', "'": 'F5'
+        };
+
+        // Piano keys configuration
+        const PIANO_KEYS = [
+            { note: 'C4', type: 'white', key: 'a' },
+            { note: 'C#4', type: 'black', key: 'w' },
+            { note: 'D4', type: 'white', key: 's' },
+            { note: 'D#4', type: 'black', key: 'e' },
+            { note: 'E4', type: 'white', key: 'd' },
+            { note: 'F4', type: 'white', key: 'f' },
+            { note: 'F#4', type: 'black', key: 't' },
+            { note: 'G4', type: 'white', key: 'g' },
+            { note: 'G#4', type: 'black', key: 'y' },
+            { note: 'A4', type: 'white', key: 'h' },
+            { note: 'A#4', type: 'black', key: 'u' },
+            { note: 'B4', type: 'white', key: 'j' },
+            { note: 'C5', type: 'white', key: 'k' },
+            { note: 'C#5', type: 'black', key: 'o' },
+            { note: 'D5', type: 'white', key: 'l' },
+            { note: 'D#5', type: 'black', key: 'p' },
+            { note: 'E5', type: 'white', key: ';' },
+            { note: 'F5', type: 'white', key: "'" }
+        ];
+
+        // Initialize audio context
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                console.log("Web Audio API initialized successfully");
+            } catch (error) {
+                console.error('Failed to initialize Web Audio API:', error);
+            }
+        }
+
+        // Play sustained tone (starts playing and continues until stopped)
+        function startSustainedTone(frequency, key) {
+            if (!audioContext || sustainedNotes[key]) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'triangle';
+
+            // Start with silence, then fade in
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.02);
+
+            oscillator.start(audioContext.currentTime);
+
+            // Store the oscillator and gain node for this key
+            sustainedNotes[key] = {
+                oscillator: oscillator,
+                gainNode: gainNode
+            };
+        }
+
+        // Stop sustained tone
+        function stopSustainedTone(key) {
+            if (!sustainedNotes[key]) return;
+
+            const { oscillator, gainNode } = sustainedNotes[key];
+
+            // Fade out quickly to avoid clicks
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            oscillator.stop(audioContext.currentTime + 0.05);
+
+            delete sustainedNotes[key];
+        }
+
+        // Play tone (legacy function for backwards compatibility)
+        function playTone(frequency, duration = 0.3) {
+            if (!audioContext) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'triangle';
+
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // Start playing note (sustained)
+        function startNote(note) {
+            const frequency = NOTE_FREQUENCIES[note];
+            if (!frequency) return;
+
+            const keyData = PIANO_KEYS.find(k => k.note === note);
+            const key = keyData ? keyData.key : note;
+
+            startSustainedTone(frequency, key);
+            
+            // Visual feedback
+            const keyElement = document.querySelector(`[data-note="${note}"]`);
+            if (keyElement) {
+                keyElement.classList.add('active');
+            }
+        }
+
+        // Stop playing note
+        function stopNote(note) {
+            const keyData = PIANO_KEYS.find(k => k.note === note);
+            const key = keyData ? keyData.key : note;
+
+            stopSustainedTone(key);
+            
+            // Remove visual feedback
+            const keyElement = document.querySelector(`[data-note="${note}"]`);
+            if (keyElement) {
+                keyElement.classList.remove('active');
+            }
+        }
+
+        // Play note (legacy function - now just triggers start/stop for mouse clicks)
+        function playNote(note) {
+            const frequency = NOTE_FREQUENCIES[note];
+            if (frequency) {
+                playTone(frequency, 0.3);
+                
+                // Visual feedback
+                const keyElement = document.querySelector(`[data-note="${note}"]`);
+                if (keyElement) {
+                    keyElement.classList.add('active');
+                    setTimeout(() => {
+                        keyElement.classList.remove('active');
+                    }, 200);
+                }
+            }
+        }
+
+        // Create piano keyboard
+        function createPianoKeyboard() {
+            const whiteKeysContainer = document.getElementById('whiteKeys');
+            const blackKeysContainer = document.getElementById('blackKeys');
+
+            // Create white keys
+            PIANO_KEYS.filter(key => key.type === 'white').forEach(key => {
+                const keyElement = document.createElement('button');
+                keyElement.className = 'piano-key w-16 h-32 border border-gray-400 rounded-b-xl hover:bg-gray-100 active:bg-gray-200 transition-all duration-150 flex flex-col justify-end items-center pb-2 bg-white text-black';
+                keyElement.setAttribute('data-note', key.note);
+                keyElement.innerHTML = `<span class="text-xs font-bold">${key.key.toUpperCase()}</span>`;
+                
+                // Mouse events for sustained audio
+                keyElement.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseup', () => {
+                    stopNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseleave', () => {
+                    stopNote(key.note);
+                });
+                
+                whiteKeysContainer.appendChild(keyElement);
+            });
+
+            // Create black keys
+            PIANO_KEYS.filter(key => key.type === 'black').forEach(key => {
+                const whiteKeyIndex = PIANO_KEYS.filter(k => k.type === 'white' && 
+                    PIANO_KEYS.indexOf(k) < PIANO_KEYS.indexOf(key)).length;
+                
+                const leftOffset = (whiteKeyIndex * 64) - 24;
+
+                const keyElement = document.createElement('button');
+                keyElement.className = 'piano-key absolute w-12 h-20 border border-gray-800 rounded-b-lg shadow-2xl hover:bg-gray-700 active:bg-gray-600 transition-all duration-150 flex flex-col justify-end items-center pb-2 z-10 bg-black text-white';
+                keyElement.style.left = `${leftOffset + 4}px`;
+                keyElement.setAttribute('data-note', key.note);
+                keyElement.innerHTML = `<span class="text-xs font-bold">${key.key.toUpperCase()}</span>`;
+                
+                // Mouse events for sustained audio
+                keyElement.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseup', () => {
+                    stopNote(key.note);
+                });
+                
+                keyElement.addEventListener('mouseleave', () => {
+                    stopNote(key.note);
+                });
+                
+                blackKeysContainer.appendChild(keyElement);
+            });
+        }
+
+        // Parse song
+        function parseSong(songText) {
+            const songKey = songText.toLowerCase().trim();
+            const song = BUILT_IN_SONGS[songKey];
+            
+            if (song) {
+                currentSong = song;
+                document.getElementById('songTitle').textContent = song.title;
+                document.getElementById('gameControls').classList.remove('hidden');
+                console.log('Loaded song:', song.title);
+                return true;
+            } else {
+                alert('Song not found! Try: Happy birthday, Twinkle twinkle little star, or Mary had a little lamb');
+                return false;
+            }
+        }
+
+        // Start game
+        function startGame() {
+            if (!currentSong) return;
+
+            gameState = 'playing';
+            score = 0;
+            gameStartTime = Date.now();
+            document.getElementById('score').textContent = score;
+            document.getElementById('startGameBtn').classList.add('hidden');
+            document.getElementById('pauseBtn').classList.remove('hidden');
+            
+            // Create falling notes
+            fallingNotes = currentSong.notes.map((note, index) => ({
+                id: `${note.note}-${note.time}-${index}`,
+                note: note.note,
+                startTime: note.time * 1000,
+                duration: note.duration * 1000,
+                hit: false,
+                element: null
+            }));
+
+            console.log('Game started with', fallingNotes.length, 'notes');
+            
+            // Start game loop
+            gameLoop();
+
+            // End game after all notes
+            const maxTime = Math.max(...currentSong.notes.map(n => n.time)) * 1000 + 8000;
+            setTimeout(() => {
+                if (gameState === 'playing') {
+                    endGame();
+                }
+            }, maxTime);
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (gameState !== 'playing') return;
+
+            const currentTime = Date.now() - gameStartTime;
+            const notesContainer = document.getElementById('notesContainer');
+
+            // Add new notes that should appear
+            fallingNotes.forEach(note => {
+                if (!note.element && currentTime >= note.startTime) {
+                    const noteElement = document.createElement('div');
+                    noteElement.className = `falling-note ${PIANO_KEYS.find(k => k.note === note.note)?.type === 'black' ? 'note-purple' : 'note-blue'}`;
+                    
+                    // Display either note name or keyboard key based on toggle
+                    const keyData = PIANO_KEYS.find(k => k.note === note.note);
+                    noteElement.textContent = showNotesOnFalling ? note.note : (keyData?.key?.toUpperCase() || note.note);
+                    
+                    noteElement.style.left = `${getNotePosition(note.note)}px`;
+                    noteElement.style.top = '0px';
+                    notesContainer.appendChild(noteElement);
+                    note.element = noteElement;
+                }
+
+                // Update note position
+                if (note.element) {
+                    const timeSinceStart = currentTime - note.startTime;
+                    const fallDuration = 5000; // 5 seconds to fall
+                    const progress = Math.max(0, Math.min(1, timeSinceStart / fallDuration));
+                    const yPosition = progress * 400; // Fall 400px
+                    
+                    note.element.style.top = `${yPosition}px`;
+
+                    // Remove notes that have passed
+                    if (yPosition > 400) {
+                        note.element.remove();
+                        note.element = null;
+                    }
+                }
+            });
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        // Get note position for falling animation
+        function getNotePosition(note) {
+            const keyIndex = PIANO_KEYS.findIndex(key => key.note === note);
+            if (keyIndex === -1) return 0;
+            
+            const key = PIANO_KEYS[keyIndex];
+            if (key.type === 'white') {
+                const whiteKeyIndex = PIANO_KEYS.filter((k, i) => k.type === 'white' && i <= keyIndex).length - 1;
+                return whiteKeyIndex * 64 + 8; // Center of white key
+            } else {
+                const whiteKeyIndex = PIANO_KEYS.filter((k, i) => k.type === 'white' && i < keyIndex).length;
+                return whiteKeyIndex * 64 - 24 + 4; // Center of black key
+            }
+        }
+
+        // End game
+        function endGame() {
+            gameState = 'finished';
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('gameCompletedOverlay').classList.remove('hidden');
+            document.getElementById('pauseBtn').classList.add('hidden');
+            document.getElementById('playAgainBtn').classList.remove('hidden');
+        }
+
+        // Show feedback
+        function showFeedback(text) {
+            const feedbackElement = document.getElementById('feedback');
+            feedbackElement.textContent = text;
+            feedbackElement.classList.remove('opacity-0');
+            feedbackElement.classList.add('animate-pulse');
+            
+            setTimeout(() => {
+                feedbackElement.classList.add('opacity-0');
+                feedbackElement.classList.remove('animate-pulse');
+            }, 1000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Prevent context menu on mouse down for better piano experience
+            document.addEventListener('contextmenu', (e) => {
+                if (e.target.classList.contains('piano-key')) {
+                    e.preventDefault();
+                }
+            });
+
+            // Initialize audio on first interaction
+            document.addEventListener('click', () => {
+                if (!audioContext) {
+                    initAudio();
+                    if (audioContext && audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                }
+            });
+
+            // Create piano keyboard
+            createPianoKeyboard();
+
+            // Keyboard events
+            document.addEventListener('keydown', (e) => {
+                const note = KEY_MAPPINGS[e.key.toLowerCase()];
+                if (note && !e.repeat) { // Prevent key repeat
+                    startNote(note);
+                    if (gameState === 'playing') {
+                        score += 5;
+                        document.getElementById('score').textContent = score;
+                        showFeedback('Hit!');
+                    }
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                const note = KEY_MAPPINGS[e.key.toLowerCase()];
+                if (note) {
+                    stopNote(note);
+                }
+            });
+
+            // Song input
+            document.getElementById('parseSongBtn').addEventListener('click', () => {
+                const songInput = document.getElementById('songInput').value;
+                if (songInput.trim()) {
+                    parseSong(songInput);
+                }
+            });
+
+            document.getElementById('songInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const songInput = document.getElementById('songInput').value;
+                    if (songInput.trim()) {
+                        parseSong(songInput);
+                    }
+                }
+            });
+
+            // Toggle button for note display
+            document.getElementById('toggleNotesBtn').addEventListener('click', () => {
+                showNotesOnFalling = !showNotesOnFalling;
+                const btn = document.getElementById('toggleNotesBtn');
+                btn.textContent = showNotesOnFalling ? 'Show Keys' : 'Show Notes';
+                
+                // Update existing falling notes
+                fallingNotes.forEach(note => {
+                    if (note.element) {
+                        const keyData = PIANO_KEYS.find(k => k.note === note.note);
+                        note.element.textContent = showNotesOnFalling ? note.note : (keyData?.key?.toUpperCase() || note.note);
+                    }
+                });
+            });
+
+            // Song suggestions
+            document.querySelectorAll('.song-suggestion').forEach(button => {
+                button.addEventListener('click', () => {
+                    const songName = button.getAttribute('data-song');
+                    document.getElementById('songInput').value = songName;
+                    parseSong(songName);
+                });
+            });
+
+            // Game controls
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            
+            document.getElementById('playAgainBtn').addEventListener('click', () => {
+                document.getElementById('gameCompletedOverlay').classList.add('hidden');
+                document.getElementById('playAgainBtn').classList.add('hidden');
+                document.getElementById('startGameBtn').classList.remove('hidden');
+                gameState = 'ready';
+                
+                // Clear notes
+                const notesContainer = document.getElementById('notesContainer');
+                notesContainer.innerHTML = '';
+            });
+        });
+    </script>
+</body>
+</html>
