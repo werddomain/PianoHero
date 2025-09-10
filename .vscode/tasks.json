@@ -31,8 +31,17 @@
             "group": "build"
         },
         {
+            "label": "TypeScript Compile",
+            "type": "shell",
+            "command": "npx",
+            "args": ["tsc"],
+            "problemMatcher": ["$tsc"]
+        },
+        {
             "label": "Build Piano Hero",
             "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": ["TypeScript Compile"],
             "command": "npx",
             "args": [
                 "webpack"

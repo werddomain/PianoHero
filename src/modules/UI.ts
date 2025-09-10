@@ -1,9 +1,12 @@
+import { Song } from './Note';
 import { GameEngine } from './GameEngine';
+import { SongLoader } from './SongLoader';
 
 export class UI {
   private container: HTMLElement;
   private gameEngine: GameEngine;
   private renderer: any;
+  private songLoader: SongLoader;
   
   // UI Components
   private scoreElement: HTMLElement;
@@ -17,6 +20,7 @@ export class UI {
     this.container = container;
     this.gameEngine = gameEngine;
     this.renderer = renderer;
+    this.songLoader = new SongLoader();
     
     // Create UI elements
     this.scoreElement = this.createScoreElement();
@@ -311,12 +315,7 @@ export class UI {
   // Load available songs
   public async loadSongs(): Promise<void> {
     try {
-      const response = await fetch('/songs/songs.json');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      const data = await this.songLoader.loadSongsList();
       
       // Clear existing options except default
       while (this.songSelectElement.options.length > 1) {
