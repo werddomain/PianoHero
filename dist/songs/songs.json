@@ -1,0 +1,58 @@
+{
+  "songs": [
+    {
+      "id": "twinkle-twinkle",
+      "title": "Twinkle Twinkle Little Star",
+      "file": "twinkle-twinkle.json",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "mary-had-a-little-lamb",
+      "title": "Mary Had a Little Lamb",
+      "file": "mary-had-a-little-lamb.json",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "happy-birthday",
+      "title": "Happy Birthday",
+      "file": "happy birthday.json",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "jingle-bells",
+      "title": "Jingle Bells",
+      "file": "jingle-bells.json",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "fur-elise",
+      "title": "Für Elise",
+      "file": "fur-elise.json",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "ode-to-joy",
+      "title": "Ode to Joy",
+      "file": "ode-to-joy.json",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "moonlight-sonata",
+      "title": "Moonlight Sonata (1st Movement)",
+      "file": "moonlight-sonata.json",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "flight-of-the-bumblebee",
+      "title": "Flight of the Bumblebee",
+      "file": "flight-of-the-bumblebee.json",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "feature-demonstration",
+      "title": "Feature Demonstration",
+      "file": "feature-demonstration.json",
+      "difficulty": "Demo"
+    }
+  ]
+}

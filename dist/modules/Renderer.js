@@ -24,6 +24,8 @@ export class Renderer {
         ];
         this.activeNotes = {};
         this.notesElements = new Map();
+        // Affiche les touches du clavier par défaut
+        this.showKeyOnNotes = true;
         // Main render function
         this.render = () => {
             const visibleNotes = this.gameEngine.getVisibleNotes();
@@ -160,23 +162,31 @@ export class Renderer {
             }
         });
     }
+    // Permet de changer dynamiquement l'affichage (note ou touche)
+    setShowKeyOnNotes(show) {
+        this.showKeyOnNotes = show;
+        // Forcer le rafraîchissement des notes affichées
+        this.updateNoteElements(this.gameEngine.getVisibleNotes());
+    }
     // Create a visual element for a note
     createNoteElement(note) {
         const element = document.createElement('div');
         element.className = 'falling-note';
-        // Set explicit width and height to match calculation in getNotePosition
         element.style.width = '48px';
         element.style.height = '32px';
-        // Determine if this is a black key or white key note
         const key = this.PIANO_KEYS.find(k => k.note === note.note);
-        // Use purple for black keys and blue for white keys
         const colorClass = (key === null || key === void 0 ? void 0 : key.type) === 'black' ? 'note-purple' : 'note-blue';
         element.classList.add(colorClass);
-        // Show note name inside the element
-        const noteText = Array.isArray(note.note) ? note.note[0] : note.note;
-        element.textContent = noteText;
-        // Position horizontally based on the note
-        const position = this.getNotePosition(noteText);
+        // Affiche la touche du clavier ou la note selon l'option
+        let label = '';
+        if (this.showKeyOnNotes && key) {
+            label = key.key.toUpperCase();
+        }
+        else {
+            label = Array.isArray(note.note) ? note.note[0] : note.note;
+        }
+        element.textContent = label;
+        const position = this.getNotePosition(Array.isArray(note.note) ? note.note[0] : note.note);
         element.style.left = `${position}px`;
         return element;
     }

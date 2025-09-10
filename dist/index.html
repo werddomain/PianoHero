@@ -32,5 +32,15 @@
     </div>
 
     <script src="bundle.js"></script>
-</body>
+    <!-- Correction GitHub Pages : forcer le chemin relatif pour les assets -->
+    <script>
+      // Redirige vers /PianoHero/ si hébergé sur GitHub Pages
+      if (window.location.hostname.endsWith('github.io')) {
+        const path = window.location.pathname;
+        if (!path.includes('/PianoHero/')) {
+          window.location.pathname = '/PianoHero/' + path.replace(/^\//, '');
+        }
+      }
+    </script>
+  </body>
 </html>

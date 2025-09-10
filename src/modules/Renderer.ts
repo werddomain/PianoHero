@@ -33,6 +33,9 @@ export class Renderer {
   private activeNotes: Record<string, HTMLElement> = {};
   private notesElements: Map<Note, HTMLElement> = new Map();
 
+  // Affiche les touches du clavier par défaut
+  private showKeyOnNotes: boolean = true;
+
   constructor(gameContainer: HTMLElement, gameEngine: GameEngine) {
     this.container = gameContainer;
     this.gameEngine = gameEngine;
@@ -200,29 +203,32 @@ export class Renderer {
     });
   }
   
+  // Permet de changer dynamiquement l'affichage (note ou touche)
+  public setShowKeyOnNotes(show: boolean) {
+    this.showKeyOnNotes = show;
+    // Forcer le rafraîchissement des notes affichées
+    this.updateNoteElements(this.gameEngine.getVisibleNotes());
+  }
+
   // Create a visual element for a note
   private createNoteElement(note: Note): HTMLElement {
     const element = document.createElement('div');
     element.className = 'falling-note';
-    
-    // Set explicit width and height to match calculation in getNotePosition
     element.style.width = '48px';
     element.style.height = '32px';
-    
-    // Determine if this is a black key or white key note
     const key = this.PIANO_KEYS.find(k => k.note === note.note);
-    // Use purple for black keys and blue for white keys
     const colorClass = key?.type === 'black' ? 'note-purple' : 'note-blue';
     element.classList.add(colorClass);
-    
-    // Show note name inside the element
-    const noteText = Array.isArray(note.note) ? note.note[0] : note.note;
-    element.textContent = noteText;
-    
-    // Position horizontally based on the note
-    const position = this.getNotePosition(noteText);
+    // Affiche la touche du clavier ou la note selon l'option
+    let label = '';
+    if (this.showKeyOnNotes && key) {
+      label = key.key.toUpperCase();
+    } else {
+      label = Array.isArray(note.note) ? note.note[0] : note.note;
+    }
+    element.textContent = label;
+    const position = this.getNotePosition(Array.isArray(note.note) ? note.note[0] : note.note);
     element.style.left = `${position}px`;
-    
     return element;
   }
   

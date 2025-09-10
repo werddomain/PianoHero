@@ -3,6 +3,7 @@ import { GameEngine } from './GameEngine';
 export class UI {
   private container: HTMLElement;
   private gameEngine: GameEngine;
+  private renderer: any;
   
   // UI Components
   private scoreElement: HTMLElement;
@@ -12,9 +13,10 @@ export class UI {
   private pauseButton: HTMLElement;
   private endScreenContainer: HTMLElement;
   
-  constructor(container: HTMLElement, gameEngine: GameEngine) {
+  constructor(container: HTMLElement, gameEngine: GameEngine, renderer?: any) {
     this.container = container;
     this.gameEngine = gameEngine;
+    this.renderer = renderer;
     
     // Create UI elements
     this.scoreElement = this.createScoreElement();
@@ -38,6 +40,10 @@ export class UI {
     rightControls.appendChild(this.songSelectElement);
     rightControls.appendChild(this.startButton);
     rightControls.appendChild(this.pauseButton);
+    
+    // Add toggle button for key display
+    const toggleButton = this.createToggleKeyOnNotesButton();
+    rightControls.appendChild(toggleButton);
     
     controlsContainer.appendChild(leftControls);
     controlsContainer.appendChild(rightControls);
@@ -327,5 +333,22 @@ export class UI {
     } catch (error) {
       console.error('Error loading songs list:', error);
     }
+  }
+  
+  // Button to toggle key display on notes
+  private createToggleKeyOnNotesButton(): HTMLElement {
+    const button = document.createElement('button');
+    button.id = 'toggle-key-on-notes';
+    button.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
+    button.textContent = 'Afficher la note';
+    let showKey = true;
+    button.addEventListener('click', () => {
+      showKey = !showKey;
+      if (this.renderer && this.renderer.setShowKeyOnNotes) {
+        this.renderer.setShowKeyOnNotes(showKey);
+      }
+      button.textContent = showKey ? 'Afficher la note' : 'Afficher la touche';
+    });
+    return button;
   }
 }

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const audioEngine = new AudioEngine();
   const renderer = new Renderer(gameContainer, gameEngine);
   const inputHandler = new InputHandler();
-  const ui = new UI(document.getElementById('ui-container') || document.body, gameEngine);
+  const ui = new UI(document.getElementById('ui-container') || document.body, gameEngine, renderer);
 
   // Load songs list
   await ui.loadSongs();

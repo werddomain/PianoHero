@@ -1,0 +1,131 @@
+{
+    "name": "Happy Birthday",
+    "notes": [
+      {
+        "note": "C4",
+        "duration": 0.75,
+        "time": 0
+      },
+      {
+        "note": "C4",
+        "duration": 0.25,
+        "time": 0.75
+      },
+      {
+        "note": "D4",
+        "duration": 1,
+        "time": 1
+      },
+      {
+        "note": "C4",
+        "duration": 1,
+        "time": 2
+      },
+      {
+        "note": "F4",
+        "duration": 1,
+        "time": 3
+      },
+      {
+        "note": "E4",
+        "duration": 2,
+        "time": 4
+      },
+      {
+        "note": "C4",
+        "duration": 0.75,
+        "time": 6
+      },
+      {
+        "note": "C4",
+        "duration": 0.25,
+        "time": 6.75
+      },
+      {
+        "note": "D4",
+        "duration": 1,
+        "time": 7
+      },
+      {
+        "note": "C4",
+        "duration": 1,
+        "time": 8
+      },
+      {
+        "note": "G4",
+        "duration": 1,
+        "time": 9
+      },
+      {
+        "note": "F4",
+        "duration": 2,
+        "time": 10
+      },
+      {
+        "note": "C4",
+        "duration": 0.75,
+        "time": 12
+      },
+      {
+        "note": "C4",
+        "duration": 0.25,
+        "time": 12.75
+      },
+      {
+        "note": "C5",
+        "duration": 1,
+        "time": 13
+      },
+      {
+        "note": "A4",
+        "duration": 1,
+        "time": 14
+      },
+      {
+        "note": "F4",
+        "duration": 1,
+        "time": 15
+      },
+      {
+        "note": "E4",
+        "duration": 1,
+        "time": 16
+      },
+      {
+        "note": "D4",
+        "duration": 2,
+        "time": 17
+      },
+      {
+        "note": "A#4",
+        "duration": 0.75,
+        "time": 19
+      },
+      {
+        "note": "A#4",
+        "duration": 0.25,
+        "time": 19.75
+      },
+      {
+        "note": "A4",
+        "duration": 1,
+        "time": 20
+      },
+      {
+        "note": "F4",
+        "duration": 1,
+        "time": 21
+      },
+      {
+        "note": "G4",
+        "duration": 1,
+        "time": 22
+      },
+      {
+        "note": "F4",
+        "duration": 2,
+        "time": 23
+      }
+    ]
+  
+}

@@ -243,6 +243,20 @@ export class GameEngine {
       if (this.onGameEndCallback) {
         this.onGameEndCallback();
       }
+    } else if (this.pendingNotes.length === 0 && this.activeNotes.length > 0) {
+      // Si toutes les notes sont actives mais non jouées, on vérifie si elles sont toutes isHit
+      const allInactive = this.activeNotes.every(note => note.isHit);
+      if (allInactive) {
+        this.activeNotes = [];
+        this.isPlaying = false;
+        if (this.gameLoopInterval) {
+          clearInterval(this.gameLoopInterval);
+          this.gameLoopInterval = null;
+        }
+        if (this.onGameEndCallback) {
+          this.onGameEndCallback();
+        }
+      }
     }
   }
 

@@ -192,4 +192,4 @@ To extend the game:
 
 ## License
 
-MIT License - feel free to modify and distribute.
+BSD-2-Clause license

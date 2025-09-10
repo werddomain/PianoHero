@@ -8,9 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 export class UI {
-    constructor(container, gameEngine) {
+    constructor(container, gameEngine, renderer) {
         this.container = container;
         this.gameEngine = gameEngine;
+        this.renderer = renderer;
         // Create UI elements
         this.scoreElement = this.createScoreElement();
         this.comboElement = this.createComboElement();
@@ -30,6 +31,9 @@ export class UI {
         rightControls.appendChild(this.songSelectElement);
         rightControls.appendChild(this.startButton);
         rightControls.appendChild(this.pauseButton);
+        // Add toggle button for key display
+        const toggleButton = this.createToggleKeyOnNotesButton();
+        rightControls.appendChild(toggleButton);
         controlsContainer.appendChild(leftControls);
         controlsContainer.appendChild(rightControls);
         this.container.appendChild(controlsContainer);
@@ -294,6 +298,22 @@ export class UI {
                 console.error('Error loading songs list:', error);
             }
         });
+    }
+    // Button to toggle key display on notes
+    createToggleKeyOnNotesButton() {
+        const button = document.createElement('button');
+        button.id = 'toggle-key-on-notes';
+        button.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
+        button.textContent = 'Afficher la note';
+        let showKey = true;
+        button.addEventListener('click', () => {
+            showKey = !showKey;
+            if (this.renderer && this.renderer.setShowKeyOnNotes) {
+                this.renderer.setShowKeyOnNotes(showKey);
+            }
+            button.textContent = showKey ? 'Afficher la note' : 'Afficher la touche';
+        });
+        return button;
     }
 }
 //# sourceMappingURL=UI.js.map
