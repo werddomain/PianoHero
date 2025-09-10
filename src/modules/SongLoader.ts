@@ -6,7 +6,7 @@ export class SongLoader {
     // Get the base path from the current URL
     // This handles both GitHub Pages (/PianoHero/) and local development
     const pathname = window.location.pathname;
-    const basePath = pathname.endsWith('/') ? '..' : '.';
+    const basePath = pathname.endsWith('/') ? pathname.substring(0, pathname.length - 1) : pathname;
     return basePath;
   }
 
