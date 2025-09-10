@@ -1,5 +1,5 @@
 # Piano Hero Game
-
+[Play Now](https://werddomain.github.io/PianoHero/)
 A TypeScript-based rhythm game where players hit piano keys in time with falling notes.
 
 ## Features
