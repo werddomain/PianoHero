@@ -2,9 +2,18 @@ import { Song } from './Note';
 
 export class SongLoader {
   // Load available songs list
+  private getBasePath(): string {
+    // Get the base path from the current URL
+    // This handles both GitHub Pages (/PianoHero/) and local development
+    const pathname = window.location.pathname;
+    const basePath = pathname.endsWith('/') ? '..' : '.';
+    return basePath;
+  }
+
   public async loadSongsList(): Promise<any> {
     try {
-      const response = await fetch('/songs/songs.json');
+      const basePath = this.getBasePath();
+      const response = await fetch(`${basePath}/songs/songs.json`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -18,7 +27,8 @@ export class SongLoader {
   // Load a specific song by filename
   public async loadSong(songFile: string): Promise<Song> {
     try {
-      const response = await fetch(`/songs/${songFile}`);
+      const basePath = this.getBasePath();
+      const response = await fetch(`${basePath}/songs/${songFile}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
