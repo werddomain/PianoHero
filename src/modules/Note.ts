@@ -40,6 +40,9 @@ export const SCORE_VALUES = {
   SUSTAINED_NOTE_TICK: 5  // Points per tick for held notes
 };
 
+// Minimum duration (in seconds) for a note to be considered "long"
+export const MIN_SUSTAINED_NOTE_DURATION = 0.5;
+
 export const COMBO_MULTIPLIERS = [
   { threshold: 0, multiplier: 1 },   // 0-3 notes
   { threshold: 4, multiplier: 2 },   // 4-7 notes
