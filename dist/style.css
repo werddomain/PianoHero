@@ -28,6 +28,11 @@ body {
 }
 
 /* Falling Notes */
+.falling-note-container {
+    position: absolute;
+    transition: top 0.1s linear;
+}
+
 .falling-note {
     position: absolute;
     width: 48px;
@@ -39,7 +44,6 @@ body {
     justify-content: center;
     font-size: 12px;
     font-weight: bold;
-    transition: top 0.1s linear;
 }
 
 .note-blue {
@@ -57,6 +61,32 @@ body {
 .note-hit {
     background-color: #10b981 !important;
     border-color: #059669 !important;
+}
+
+/* Sustain Bar for Long Notes */
+.sustain-bar {
+    position: absolute;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.sustain-bar.note-blue {
+    background: linear-gradient(to top, #3b82f6, #60a5fa);
+    border: 1px solid #2563eb;
+}
+
+.sustain-bar.note-purple {
+    background: linear-gradient(to top, #8b5cf6, #a78bfa);
+    border: 1px solid #7c3aed;
+}
+
+/* Visual feedback for held notes */
+.note-being-held {
+    animation: pulseSustain 0.5s infinite alternate;
+}
+
+@keyframes pulseSustain {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
 }
 
 /* Animation classes */

@@ -186,8 +186,8 @@ export class Renderer {
       // Update position if element exists
       if (element) {
         this.updateNotePosition(element, note);
-        
-        // Update appearance based on hit status
+
+        // Update appearance based on hit status and held status
         if (note.isHit) {
           if (note.hitQuality === 'perfect') {
             element.classList.add('note-hit', 'bg-green-500', 'border-green-600');
@@ -197,6 +197,24 @@ export class Renderer {
             element.classList.add('note-hit', 'bg-orange-500', 'border-orange-600');
           } else if (note.hitQuality === 'miss') {
             element.classList.add('note-hit', 'bg-red-500', 'border-red-600');
+          }
+
+          // Visual feedback for held notes
+          if (note.isBeingHeld) {
+            element.classList.add('note-being-held');
+            // Add a pulsing effect to the sustain bar
+            const sustainBar = element.querySelector('.sustain-bar');
+            if (sustainBar) {
+              (sustainBar as HTMLElement).style.opacity = '1';
+              (sustainBar as HTMLElement).style.filter = 'brightness(1.3)';
+            }
+          } else {
+            element.classList.remove('note-being-held');
+            const sustainBar = element.querySelector('.sustain-bar');
+            if (sustainBar) {
+              (sustainBar as HTMLElement).style.opacity = '0.7';
+              (sustainBar as HTMLElement).style.filter = 'none';
+            }
           }
         }
       }
@@ -212,13 +230,39 @@ export class Renderer {
 
   // Create a visual element for a note
   private createNoteElement(note: Note): HTMLElement {
-    const element = document.createElement('div');
-    element.className = 'falling-note';
-    element.style.width = '48px';
-    element.style.height = '32px';
+    const container = document.createElement('div');
+    container.className = 'falling-note-container';
+    container.style.width = '48px';
+    container.style.position = 'absolute';
+
     const key = this.PIANO_KEYS.find(k => k.note === note.note);
     const colorClass = key?.type === 'black' ? 'note-purple' : 'note-blue';
-    element.classList.add(colorClass);
+
+    // Calculate note height based on duration (for long notes visualization)
+    // Minimum height is 32px, add 60px per second of duration for long notes
+    const MIN_NOTE_HEIGHT = 32;
+    const PIXELS_PER_SECOND = 60; // Visual height per second of note duration
+
+    let totalHeight = MIN_NOTE_HEIGHT;
+    let hasSustainBar = false;
+
+    // For notes >= 0.5s, add a visual sustain bar
+    if (note.duration >= 0.5) {
+      totalHeight = MIN_NOTE_HEIGHT + (note.duration * PIXELS_PER_SECOND);
+      hasSustainBar = true;
+    }
+
+    container.style.height = `${totalHeight}px`;
+
+    // Create the note head (always visible at bottom of container)
+    const noteHead = document.createElement('div');
+    noteHead.className = `falling-note ${colorClass}`;
+    noteHead.style.width = '48px';
+    noteHead.style.height = '32px';
+    noteHead.style.position = 'absolute';
+    noteHead.style.bottom = '0';
+    noteHead.style.left = '0';
+
     // Affiche la touche du clavier ou la note selon l'option
     let label = '';
     if (this.showKeyOnNotes && key) {
@@ -226,10 +270,29 @@ export class Renderer {
     } else {
       label = Array.isArray(note.note) ? note.note[0] : note.note;
     }
-    element.textContent = label;
+    noteHead.textContent = label;
+
+    // If this is a long note, create a sustain bar
+    if (hasSustainBar) {
+      const sustainBar = document.createElement('div');
+      sustainBar.className = `sustain-bar ${colorClass}`;
+      sustainBar.style.width = '24px'; // Thinner than the note head
+      sustainBar.style.height = `${totalHeight - MIN_NOTE_HEIGHT}px`;
+      sustainBar.style.position = 'absolute';
+      sustainBar.style.bottom = '32px'; // Start above the note head
+      sustainBar.style.left = '12px'; // Center the bar
+      sustainBar.style.opacity = '0.7';
+      sustainBar.style.borderRadius = '4px 4px 0 0';
+
+      container.appendChild(sustainBar);
+    }
+
+    container.appendChild(noteHead);
+
     const position = this.getNotePosition(Array.isArray(note.note) ? note.note[0] : note.note);
-    element.style.left = `${position}px`;
-    return element;
+    container.style.left = `${position}px`;
+
+    return container;
   }
   
   // Update note position based on time to hit
@@ -238,14 +301,21 @@ export class Renderer {
     // When timeToHit = 5, note should be at the top of the container
     // When timeToHit = 0, bottom of the note should touch the bottom of the container
     const containerHeight = this.notesContainer.clientHeight;
-    const noteHeight = 32; // Height of the note element
+
+    // Calculate actual note height (including sustain bar for long notes)
+    const MIN_NOTE_HEIGHT = 32;
+    const PIXELS_PER_SECOND = 60;
+    const noteHeight = note.duration >= 0.5
+      ? MIN_NOTE_HEIGHT + (note.duration * PIXELS_PER_SECOND)
+      : MIN_NOTE_HEIGHT;
+
     const timeToHit = note.timeToHit !== undefined ? note.timeToHit : 0;
     const normalizedPosition = (timeToHit / 5);
-    
+
     // Calculate position so the BOTTOM of the note aligns with container bottom when timeToHit = 0
     // Subtract noteHeight to position based on the top of the note element
     const yPosition = (containerHeight - noteHeight) * (1 - normalizedPosition);
-    
+
     element.style.top = `${yPosition}px`;
   }
   
