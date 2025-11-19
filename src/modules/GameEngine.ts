@@ -11,6 +11,7 @@ export class GameEngine {
   private song: Song | null = null;
   private activeNotes: Note[] = [];
   private pendingNotes: Note[] = [];
+  private heldNotes: Map<string, Note> = new Map(); // Track currently held notes
   private statistics = {
     perfect: 0,
     good: 0,
@@ -68,6 +69,7 @@ export class GameEngine {
     this.comboMultiplier = 1;
     this.currentTime = -5;
     this.activeNotes = [];
+    this.heldNotes.clear(); // Clear held notes tracking
     
     if (this.song) {
       // Deep clone the notes to avoid modifying the original
@@ -157,9 +159,12 @@ export class GameEngine {
     // Update current time
     this.currentTime += deltaTime;
 
+    // Update held notes and award sustained points
+    this.updateHeldNotes(deltaTime);
+
     // Move notes from pending to active as needed
     this.updateNoteQueues();
-    
+
     // Check for missed notes
     this.checkMissedNotes();
 
@@ -167,20 +172,48 @@ export class GameEngine {
     this.checkGameEnd();
   }
 
+  // Update held notes and award sustained points
+  private updateHeldNotes(deltaTime: number): void {
+    this.heldNotes.forEach((note, noteName) => {
+      if (!note.isBeingHeld) return;
+
+      // Update held duration
+      note.heldDuration = (note.heldDuration || 0) + deltaTime;
+
+      // Award points for holding the note (using SUSTAINED_NOTE_TICK constant)
+      // Award points every frame while holding
+      const pointsToAdd = SCORE_VALUES.SUSTAINED_NOTE_TICK * this.comboMultiplier * deltaTime * 10;
+      this.score += pointsToAdd;
+
+      // Check if note has been held for its full duration
+      if (note.heldDuration >= note.duration) {
+        // Note has been held for its full duration
+        // Stop tracking it but keep it in heldNotes until key release
+        // This prevents double-counting points
+        note.isBeingHeld = false;
+      }
+
+      // Update score display
+      if (this.onScoreUpdateCallback) {
+        this.onScoreUpdateCallback(this.score);
+      }
+    });
+  }
+
   // Update note queues
   private updateNoteQueues(): void {
     // Check for notes that should become active
     // Notes become active 5 seconds before they should be hit
     const notesToActivate: Note[] = [];
-    
-    while (this.pendingNotes.length > 0 && 
+
+    while (this.pendingNotes.length > 0 &&
            this.pendingNotes[0].time <= this.currentTime + 5) {
       notesToActivate.push(this.pendingNotes.shift()!);
     }
-    
+
     if (notesToActivate.length > 0) {
       this.activeNotes = [...this.activeNotes, ...notesToActivate];
-      
+
       // Notify about new active notes
       notesToActivate.forEach(note => {
         if (this.onNoteStateChangeCallback) {
@@ -313,6 +346,14 @@ export class GameEngine {
     const scoreToAdd = points * this.comboMultiplier;
     this.score += scoreToAdd;
 
+    // Track sustained notes (notes with duration > 0)
+    if (closestNote.duration > 0) {
+      closestNote.pressTime = this.currentTime;
+      closestNote.isBeingHeld = true;
+      closestNote.heldDuration = 0;
+      this.heldNotes.set(noteName, closestNote);
+    }
+
     // Notify listeners
     if (this.onNoteStateChangeCallback) {
       this.onNoteStateChangeCallback(closestNote);
@@ -329,7 +370,38 @@ export class GameEngine {
 
   // Handle note release
   public handleNoteRelease(noteName: string): void {
-    // For future implementation of sustained notes
+    const heldNote = this.heldNotes.get(noteName);
+
+    if (!heldNote) return;
+
+    // Stop tracking held duration
+    heldNote.isBeingHeld = false;
+
+    // Calculate hold accuracy
+    const holdPercentage = (heldNote.heldDuration || 0) / heldNote.duration;
+
+    // Award bonus points based on how much of the note was held
+    // Full hold (>90%) = bonus points
+    // Partial hold (50-90%) = some bonus
+    // Early release (<50%) = no bonus or small penalty
+    if (holdPercentage >= 0.9) {
+      // Excellent hold - bonus points
+      const bonusPoints = Math.floor(50 * this.comboMultiplier);
+      this.score += bonusPoints;
+    } else if (holdPercentage >= 0.5) {
+      // Good hold - small bonus
+      const bonusPoints = Math.floor(25 * this.comboMultiplier);
+      this.score += bonusPoints;
+    }
+    // If < 50%, no bonus points awarded
+
+    // Remove from held notes tracking
+    this.heldNotes.delete(noteName);
+
+    // Update score display
+    if (this.onScoreUpdateCallback) {
+      this.onScoreUpdateCallback(this.score);
+    }
   }
 
   // Update combo multiplier based on combo count

@@ -9,6 +9,10 @@ export interface Note {
   timeToHit?: number; // Time remaining until the note should be hit
   isChord?: boolean; // Whether this note is part of a chord
   chordId?: string;  // ID to identify notes that are part of the same chord
+  // Sustained note tracking
+  pressTime?: number; // When the note was pressed (game time in seconds)
+  isBeingHeld?: boolean; // Whether the note is currently being held
+  heldDuration?: number; // How long the note has been held (seconds)
 }
 
 export interface Song {
