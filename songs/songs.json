@@ -19,6 +19,24 @@
       "difficulty": "Easy"
     },
     {
+      "id": "hot-cross-buns",
+      "title": "Hot Cross Buns",
+      "file": "hot-cross-buns.json",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "london-bridge",
+      "title": "London Bridge",
+      "file": "london-bridge.json",
+      "difficulty": "Easy"
+    },
+    {
+      "id": "row-row-row",
+      "title": "Row Row Row Your Boat",
+      "file": "row-row-row.json",
+      "difficulty": "Easy"
+    },
+    {
       "id": "jingle-bells",
       "title": "Jingle Bells",
       "file": "jingle-bells.json",
