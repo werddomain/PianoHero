@@ -185,7 +185,7 @@ export class UI {
   private createEndScreenContainer(): HTMLElement {
     const container = document.createElement('div');
     container.id = 'end-screen';
-    container.className = 'absolute inset-0 bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center z-50 p-8';
+    container.className = 'fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center z-50 p-8 hidden';
     
     const title = document.createElement('h2');
     title.className = 'text-3xl font-bold mb-6 text-white';

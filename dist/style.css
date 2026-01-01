@@ -9,6 +9,11 @@ body {
     color: white;
 }
 
+/* Utility classes (fallback for Tailwind) */
+.hidden {
+    display: none !important;
+}
+
 /* Piano Keys */
 .piano-key {
     user-select: none;
