@@ -8,7 +8,8 @@ export class SongLoader {
     let pathname = window.location.pathname;
     
     // Remove the filename if present (e.g., index.html)
-    if (pathname.includes('.html') || pathname.includes('.htm')) {
+    // Only strip if the path actually ends with .html or .htm extension
+    if (pathname.endsWith('.html') || pathname.endsWith('.htm')) {
       pathname = pathname.substring(0, pathname.lastIndexOf('/'));
     }
     

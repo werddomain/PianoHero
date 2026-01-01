@@ -157,7 +157,7 @@ export class UI {
       // Store current song info for scoreboard
       const selectedOption = this.songSelectElement.options[this.songSelectElement.selectedIndex];
       this.currentSongId = selectedSong.replace('.json', '');
-      this.currentSongTitle = selectedOption.textContent || selectedSong;
+      this.currentSongTitle = selectedOption.textContent || this.currentSongId;
       
       try {
         await this.gameEngine.loadSong(selectedSong);
@@ -258,10 +258,30 @@ export class UI {
       noScores.textContent = 'No scores yet. Play a song to set a high score!';
       scoresContainer.appendChild(noScores);
     } else {
-      // Create header row
+      // Create header row using DOM manipulation instead of innerHTML
       const headerRow = document.createElement('div');
       headerRow.className = 'flex justify-between items-center text-gray-400 text-sm border-b border-gray-600 pb-2 mb-2';
-      headerRow.innerHTML = '<span class="w-8">#</span><span class="flex-1">Song</span><span class="w-20 text-right">Score</span><span class="w-12 text-center">Grade</span>';
+      
+      const rankHeader = document.createElement('span');
+      rankHeader.className = 'w-8';
+      rankHeader.textContent = '#';
+      
+      const songHeader = document.createElement('span');
+      songHeader.className = 'flex-1';
+      songHeader.textContent = 'Song';
+      
+      const scoreHeader = document.createElement('span');
+      scoreHeader.className = 'w-20 text-right';
+      scoreHeader.textContent = 'Score';
+      
+      const gradeHeader = document.createElement('span');
+      gradeHeader.className = 'w-12 text-center';
+      gradeHeader.textContent = 'Grade';
+      
+      headerRow.appendChild(rankHeader);
+      headerRow.appendChild(songHeader);
+      headerRow.appendChild(scoreHeader);
+      headerRow.appendChild(gradeHeader);
       scoresContainer.appendChild(headerRow);
       
       // Add score entries
@@ -420,7 +440,10 @@ export class UI {
       
       const gradeRow = document.createElement('div');
       gradeRow.className = 'mt-4 text-center';
-      gradeRow.innerHTML = `<span class="text-4xl font-bold ${gradeColor}">${grade}</span>`;
+      const gradeSpan = document.createElement('span');
+      gradeSpan.className = `text-4xl font-bold ${gradeColor}`;
+      gradeSpan.textContent = grade;
+      gradeRow.appendChild(gradeSpan);
       statsContainer.appendChild(gradeRow);
       
       // Save score to scoreboard
