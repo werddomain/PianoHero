@@ -1,6 +1,7 @@
 import { Song } from './Note';
 import { GameEngine } from './GameEngine';
 import { SongLoader } from './SongLoader';
+import { Scoreboard, ScoreEntry } from './Scoreboard';
 
 export class UI {
   private container: HTMLElement;
@@ -15,6 +16,12 @@ export class UI {
   private startButton: HTMLElement;
   private pauseButton: HTMLElement;
   private endScreenContainer: HTMLElement;
+  private scoreboardButton: HTMLElement;
+  private scoreboardContainer: HTMLElement;
+  
+  // Track current song info
+  private currentSongId: string = '';
+  private currentSongTitle: string = '';
   
   constructor(container: HTMLElement, gameEngine: GameEngine, renderer?: any) {
     this.container = container;
@@ -28,7 +35,9 @@ export class UI {
     this.songSelectElement = this.createSongSelectElement();
     this.startButton = this.createStartButton();
     this.pauseButton = this.createPauseButton();
+    this.scoreboardButton = this.createScoreboardButton();
     this.endScreenContainer = this.createEndScreenContainer();
+    this.scoreboardContainer = this.createScoreboardContainer();
     
     // Add UI elements to container
     const controlsContainer = document.createElement('div');
@@ -44,6 +53,7 @@ export class UI {
     rightControls.appendChild(this.songSelectElement);
     rightControls.appendChild(this.startButton);
     rightControls.appendChild(this.pauseButton);
+    rightControls.appendChild(this.scoreboardButton);
     
     // Add toggle button for key display
     const toggleButton = this.createToggleKeyOnNotesButton();
@@ -54,10 +64,12 @@ export class UI {
     
     this.container.appendChild(controlsContainer);
     this.container.appendChild(this.endScreenContainer);
+    this.container.appendChild(this.scoreboardContainer);
     
-    // Hide pause button and end screen initially
+    // Hide pause button, end screen and scoreboard initially
     this.pauseButton.classList.add('hidden');
     this.endScreenContainer.classList.add('hidden');
+    this.scoreboardContainer.classList.add('hidden');
     
     // Register callbacks
     this.gameEngine.onScoreUpdate((score) => this.updateScore(score));
@@ -142,6 +154,11 @@ export class UI {
         return;
       }
       
+      // Store current song info for scoreboard
+      const selectedOption = this.songSelectElement.options[this.songSelectElement.selectedIndex];
+      this.currentSongId = selectedSong.replace('.json', '');
+      this.currentSongTitle = selectedOption.textContent || selectedSong;
+      
       try {
         await this.gameEngine.loadSong(selectedSong);
         this.gameEngine.startGame();
@@ -181,6 +198,110 @@ export class UI {
     return element;
   }
   
+  // Create scoreboard button
+  private createScoreboardButton(): HTMLElement {
+    const element = document.createElement('button');
+    element.id = 'scoreboard-button';
+    element.className = 'bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded';
+    element.textContent = 'Scoreboard';
+    
+    element.addEventListener('click', () => {
+      this.showScoreboard();
+    });
+    
+    return element;
+  }
+  
+  // Create scoreboard container
+  private createScoreboardContainer(): HTMLElement {
+    const container = document.createElement('div');
+    container.id = 'scoreboard-screen';
+    container.className = 'fixed inset-0 bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center z-50 p-8 hidden';
+    
+    const title = document.createElement('h2');
+    title.className = 'text-3xl font-bold mb-6 text-white';
+    title.textContent = 'High Scores';
+    
+    const scoresContainer = document.createElement('div');
+    scoresContainer.id = 'scoreboard-scores';
+    scoresContainer.className = 'flex flex-col gap-2 mb-6 w-full max-w-lg bg-gray-800 p-4 rounded-md max-h-96 overflow-y-auto';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded';
+    closeButton.textContent = 'Close';
+    
+    closeButton.addEventListener('click', () => {
+      this.hideScoreboard();
+    });
+    
+    container.appendChild(title);
+    container.appendChild(scoresContainer);
+    container.appendChild(closeButton);
+    
+    return container;
+  }
+  
+  // Show scoreboard
+  private showScoreboard(): void {
+    const scoresContainer = document.getElementById('scoreboard-scores');
+    if (!scoresContainer) return;
+    
+    // Clear previous content
+    scoresContainer.innerHTML = '';
+    
+    // Get top scores
+    const topScores = Scoreboard.getTopScores(10);
+    
+    if (topScores.length === 0) {
+      const noScores = document.createElement('div');
+      noScores.className = 'text-center text-gray-400 py-4';
+      noScores.textContent = 'No scores yet. Play a song to set a high score!';
+      scoresContainer.appendChild(noScores);
+    } else {
+      // Create header row
+      const headerRow = document.createElement('div');
+      headerRow.className = 'flex justify-between items-center text-gray-400 text-sm border-b border-gray-600 pb-2 mb-2';
+      headerRow.innerHTML = '<span class="w-8">#</span><span class="flex-1">Song</span><span class="w-20 text-right">Score</span><span class="w-12 text-center">Grade</span>';
+      scoresContainer.appendChild(headerRow);
+      
+      // Add score entries
+      topScores.forEach((score, index) => {
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center py-2 border-b border-gray-700';
+        
+        const rank = document.createElement('span');
+        rank.className = 'w-8 text-gray-400';
+        rank.textContent = `${index + 1}.`;
+        
+        const songTitle = document.createElement('span');
+        songTitle.className = 'flex-1 text-white truncate';
+        songTitle.textContent = score.songTitle;
+        
+        const scoreValue = document.createElement('span');
+        scoreValue.className = 'w-20 text-right text-blue-400 font-bold';
+        scoreValue.textContent = score.score.toString();
+        
+        const grade = document.createElement('span');
+        grade.className = `w-12 text-center font-bold ${Scoreboard.getGradeColor(score.grade)}`;
+        grade.textContent = score.grade;
+        
+        row.appendChild(rank);
+        row.appendChild(songTitle);
+        row.appendChild(scoreValue);
+        row.appendChild(grade);
+        
+        scoresContainer.appendChild(row);
+      });
+    }
+    
+    this.scoreboardContainer.classList.remove('hidden');
+  }
+  
+  // Hide scoreboard
+  private hideScoreboard(): void {
+    this.scoreboardContainer.classList.add('hidden');
+  }
+
   // Create end screen container
   private createEndScreenContainer(): HTMLElement {
     const container = document.createElement('div');
@@ -301,6 +422,28 @@ export class UI {
       gradeRow.className = 'mt-4 text-center';
       gradeRow.innerHTML = `<span class="text-4xl font-bold ${gradeColor}">${grade}</span>`;
       statsContainer.appendChild(gradeRow);
+      
+      // Save score to scoreboard
+      const scoreEntry: ScoreEntry = {
+        songId: this.currentSongId,
+        songTitle: this.currentSongTitle,
+        score: Math.floor(gameState.score),
+        accuracy: accuracy,
+        grade: grade,
+        maxCombo: gameState.statistics.maxCombo,
+        date: new Date().toISOString()
+      };
+      
+      const isHighScore = Scoreboard.isHighScore(this.currentSongId, scoreEntry.score);
+      Scoreboard.saveScore(scoreEntry);
+      
+      // Show high score notification if applicable
+      if (isHighScore) {
+        const highScoreNotice = document.createElement('div');
+        highScoreNotice.className = 'mt-4 text-center text-yellow-300 font-bold animate-pulse';
+        highScoreNotice.textContent = '🎉 New High Score! 🎉';
+        statsContainer.appendChild(highScoreNotice);
+      }
     }
     
     // Show end screen
