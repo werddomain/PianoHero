@@ -14,6 +14,26 @@ body {
     display: none !important;
 }
 
+/* Keyboard container layout (fallback for Tailwind) */
+#piano-container > div {
+    position: relative;
+}
+
+#white-keys {
+    display: flex;
+}
+
+#black-keys {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#black-keys .piano-key {
+    position: absolute;
+    z-index: 10;
+}
+
 /* Piano Keys */
 .piano-key {
     user-select: none;
@@ -21,6 +41,39 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     transition: all 0.1s ease;
+    border: 1px solid #9ca3af;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* White key styling (fallback for Tailwind) */
+#white-keys .piano-key {
+    background-color: white;
+    color: black;
+    border-radius: 0 0 12px 12px;
+}
+
+#white-keys .piano-key:hover {
+    background-color: #f3f4f6;
+}
+
+/* Black key styling (fallback for Tailwind) */
+#black-keys .piano-key {
+    background-color: black;
+    color: white;
+    border-color: #1f2937;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+#black-keys .piano-key:hover {
+    background-color: #374151;
 }
 
 .piano-key:hover {
