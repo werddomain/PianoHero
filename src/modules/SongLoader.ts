@@ -5,7 +5,15 @@ export class SongLoader {
   private getBasePath(): string {
     // Get the base path from the current URL
     // This handles both GitHub Pages (/PianoHero/) and local development
-    const pathname = window.location.pathname;
+    let pathname = window.location.pathname;
+    
+    // Remove the filename if present (e.g., index.html)
+    // Only strip if the path actually ends with .html or .htm extension
+    if (pathname.endsWith('.html') || pathname.endsWith('.htm')) {
+      pathname = pathname.substring(0, pathname.lastIndexOf('/'));
+    }
+    
+    // Remove trailing slash if present
     const basePath = pathname.endsWith('/') ? pathname.substring(0, pathname.length - 1) : pathname;
     return basePath;
   }
